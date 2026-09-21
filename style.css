@@ -1,0 +1,132 @@
+/* ===== 1. PALETA (una sola :root) ===== */
+:root{
+  --fondo:#0c0e08; --crema:#d8e0b0; --oliva:#8a9a5b; --oliva-os:#556b2f;
+  --borde:#3a4a26; --panel-bg:#11140c;
+  --b1:#d8e0b0; --b2:#8a9a5b; --b3:#a8b868; --b4:#556b2f; --b5:#3a4a26;
+  --crt: repeating-linear-gradient(
+    to bottom,
+    rgba(0,0,0,0) 0px, rgba(0,0,0,0) 2px,
+    rgba(0,0,0,.18) 3px, rgba(0,0,0,.18) 4px
+  );
+}
+
+/* ===== 2. BASE + SNAP SUAVE (ya no "encaja" a la fuerza) ===== */
+*{box-sizing:border-box; margin:0; padding:0}
+html{
+  scroll-behavior:smooth;
+  scroll-snap-type:y proximity;   /* proximity = engancha si estás cerca, no secuestra */
+  scroll-padding-top:3rem;
+}
+body{
+  background:var(--fondo);
+  color:var(--crema);
+  font-family:'Press Start 2P', monospace;
+  line-height:1.7;
+  overflow-x:hidden;
+}
+
+/* ===== 3. CRT ===== */
+body::after{
+  content:""; position:fixed; inset:0;
+  background:var(--crt);
+  pointer-events:none; z-index:9999; opacity:.6;
+}
+
+/* ===== 4. LLUVIA ===== */
+#matrix{ position:fixed; inset:0; z-index:0; display:block; width:100%; height:100%; }
+
+/* ===== 5. TICKER ===== */
+.ticker{
+  position:relative; z-index:3;
+  border-bottom:1px solid var(--borde);
+  background:var(--panel-bg);
+  overflow:hidden; white-space:nowrap;
+  font-size:.7rem; color:var(--oliva);
+}
+.ticker span{ display:inline-block; padding-left:100%; animation:slide 22s linear infinite; }
+@keyframes slide{ to{ transform:translateX(-100%);} }
+
+/* ===== 6. ÍNDICE ===== */
+.top-nav{
+  position:sticky; top:0; z-index:5;
+  display:flex; justify-content:center; gap:1.2rem; flex-wrap:wrap;
+  padding:.6rem 1rem;
+  background:var(--panel-bg);
+  border-bottom:1px solid var(--borde);
+  font-size:.7rem;
+}
+.top-nav a{
+  color:var(--crema); text-decoration:none;
+  padding:.3rem .5rem; border:1px solid transparent;
+  transition:color .2s, border-color .2s, text-shadow .2s;
+}
+.top-nav a:hover{
+  color:var(--oliva); border-color:var(--borde);
+  text-shadow:0 0 6px var(--oliva);
+}
+
+/* ===== 7. PÁGINAS (pantalla completa, contenido que llene) ===== */
+.page{
+  min-height:100vh;
+  display:flex; align-items:center; justify-content:center;
+  padding:5rem 1.2rem;
+  scroll-snap-align:start;
+  position:relative; z-index:1;
+}
+main{ display:block; }
+
+/* ===== 8. PANELS (más anchos: deja de ser "cuadradito") ===== */
+.panel{
+  width:100%; max-width:920px;     /* antes 760 → ahora llena más la pantalla */
+  background:var(--panel-bg);
+  border:1px solid var(--borde);
+  padding:2.2rem;
+}
+.panel p{ font-size:.85rem; }       /* un pelín más grande para que ocupe */
+.panel a{
+  color:var(--b3); text-decoration:underline; text-underline-offset:3px;
+  transition:color .2s;
+}
+.panel a:hover{ color:var(--crema); }
+.hero{ text-align:center; }
+.panel h2{ color:var(--oliva); font-size:1.1rem; margin-bottom:.9rem; }
+.lista{ list-style:none; font-size:.85rem; }
+.lista li{ margin:.6rem 0; }
+.prompt{ color:var(--oliva); }
+.tags{ display:flex; flex-wrap:wrap; gap:.6rem; font-size:.8rem; }
+.tags span{ border:1px solid var(--borde); padding:.35rem .6rem; }
+
+/* ===== 9. LOGO ===== */
+#logo{
+  --tx:0px; --ty:0px;
+  font-size:clamp(2rem,9vw,5rem); letter-spacing:.05em;
+  background:linear-gradient(to bottom,
+    var(--b1) 0 26.316%, var(--b2) 26.316% 36.842%,
+    var(--b3) 36.842% 57.895%, var(--b4) 57.895% 73.684%,
+    var(--b5) 73.684% 100%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  transform:translate(var(--tx),var(--ty));
+  transition:filter .2s, transform .2s;
+}
+#logo:hover{
+  filter:drop-shadow(0 0 10px var(--oliva));
+  transform:translate(calc(var(--tx) + 2px),calc(var(--ty) - 2px));
+}
+.frase{ margin-top:1rem; color:var(--oliva); font-size:.95rem; min-height:1.6em; }
+.meta{ margin-top:.6rem; color:var(--oliva-os); font-size:.7rem; }
+
+/* ===== 10. BOTÓN DIOSES ===== */
+#boton-dios{
+  margin-top:1rem; cursor:pointer;
+  font-family:inherit; font-size:.8rem;
+  color:var(--crema); background:var(--fondo);
+  border:1px solid var(--oliva); padding:.6rem .9rem;
+  transition:background .2s, color .2s;
+}
+#boton-dios:hover{ background:var(--oliva); color:var(--fondo); }
+.mensaje{ margin-top:.8rem; color:var(--b3); font-size:.8rem; min-height:1.2em; }
+
+/* ===== 11. FOOTER ===== */
+.contacto{ display:flex; justify-content:center; gap:1rem; margin-top:.8rem; flex-wrap:wrap; }
+.contacto a{ color:var(--oliva); text-decoration:none; }
+.contacto a:hover{ color:var(--crema); }
