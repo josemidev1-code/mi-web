@@ -1,19 +1,31 @@
 /* =========================================================
    JOSEMI OS · v1.2 (Windows 95)
    WM = motor de ventanas. Apps = contenido plug-in.
+
+   ORDEN MENTAL DEL PROGRAMA
+   1. Se recuperan los ajustes guardados.
+   2. Apps describe el contenido de cada aplicación.
+   3. WM crea, mueve, redimensiona y cierra ventanas.
+   4. Los build... conectan el HTML con eventos del usuario.
+   5. initLogin y typeLoginArt preparan la pantalla inicial.
    ========================================================= */
+// Atajos: $(selector) devuelve el primer elemento y $$(selector), un array con todos.
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+// sleep permite usar "await sleep(ms)"; pad convierte 7 en "07" para el reloj.
 const sleep=ms=>new Promise(r=>setTimeout(r,ms)), pad=n=>String(n).padStart(2,'0');
 
 /* --- Estado persistente --- */
+// DEF contiene valores iniciales. Object.assign mezcla encima lo guardado en localStorage.
 const DEF={accent:'#6C63FF',bg:'#050505',wp:0,sound:true,motion:false};
 let state=Object.assign({},DEF);
 try{ state=Object.assign(state, JSON.parse(localStorage.getItem('josemi-os')||'{}')); }catch(e){}
+// localStorage conserva datos aunque se cierre o recargue la pestaña.
 const save=()=>{ try{ localStorage.setItem('josemi-os',JSON.stringify(state)); }catch(e){} };
 
 /* --- Wallpapers (tonos planos estilo Win95) --- */
 const WALLS=['#008080','#006666','#004040','#0080a0'];
 function applyTheme(){
+  // Las variables CSS (--accent y --bg) permiten cambiar muchos estilos desde un solo lugar.
   document.documentElement.style.setProperty('--accent',state.accent);
   document.documentElement.style.setProperty('--bg',state.bg);
   $('#bg').style.background=WALLS[state.wp];
@@ -26,6 +38,7 @@ let AC;
 function beep(){
   if(!state.sound)return;
   try{
+    // Web Audio genera dos notas cuadradas; no hace falta descargar un archivo de sonido.
     AC=AC||new (window.AudioContext||window.webkitAudioContext)();
     const t=AC.currentTime;
     [[1046,.08],[784,.14]].forEach(([f,d],i)=>{
@@ -37,10 +50,15 @@ function beep(){
     });
   }catch(e){}
 }
+// Una notificación "toast" se crea, se anima y se elimina para no acumular nodos en el DOM.
 function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;$('#toasts').appendChild(t);
   setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(20px)';t.style.transition='.3s';},2600);setTimeout(()=>t.remove(),3000);}
 
-/* ========================================================= APPS */
+/* ========================================================= APPS
+   Cada propiedad es una aplicación. render() devuelve su HTML y bind(), cuando
+   existe, conecta eventos después de insertar ese HTML en una ventana.
+   Añadir una app nueva aquí y su id en ICONS basta para mostrarla en el sistema.
+   ========================================================= */
 const Apps={
  about:{title:'About Me',icon:'👤',render:()=>`
    <div class="app-title">USER PROFILE</div>
@@ -70,6 +88,7 @@ const Apps={
    <div class="term"><div class="term__out" id="term-out"></div>
    <div class="term__line"><span class="p">josemi@portfolio</span>:<span class="dir">~</span>$<input class="term__in" id="term-in" autocomplete="off" spellcheck="false"></div></div>`,
    bind(b){const out=$('#term-out',b),inp=$('#term-in',b);
+     // Esta función imprime una nueva línea dentro de la terminal simulada.
      const print=(h,c='')=>{const d=document.createElement('div');d.className=c;d.innerHTML=h;out.appendChild(d);out.scrollTop=out.scrollHeight;};
      print('JOSEMI OS Terminal · type <span class="ok">help</span>');
      inp.addEventListener('keydown',e=>{if(e.key!=='Enter')return;const raw=inp.value.trim();inp.value='';
@@ -82,9 +101,9 @@ const Apps={
    <div class="contact"><h2>LET'S BUILD SOMETHING.</h2><div class="links">
      <a class="clink" href="https://github.com/josemidev1-code" target="_blank" rel="noopener"><span class="g">🐙</span> GitHub</a>
      <a class="clink" href="https://www.linkedin.com/in/TU_USUARIO" target="_blank" rel="noopener"><span class="g">💼</span> LinkedIn</a>
-     <a class="clink" href="mailto:josemidev1@gmail.com.com"><span class="g">✉️</span> tu_email@ejemplo.com</a>
+     <a class="clink" href="mailto:josemidev1@gmail.com"><span class="g">✉️</span> josemidev1@gmail.com</a>
    </div><button class="btn btn--accent" id="copy-email">COPY EMAIL</button></div>`,
-   bind(b){$('#copy-email',b).addEventListener('click',async()=>{try{await navigator.clipboard.writeText('tu_email@ejemplo.com');toast('Copied to clipboard.');}catch{toast('No clipboard access.');}});}},
+   bind(b){$('#copy-email',b).addEventListener('click',async()=>{try{await navigator.clipboard.writeText('josemidev1@gmail.com');toast('Copied to clipboard.');}catch{toast('No clipboard access.');}});}},
 
  trash:{title:'Trash',icon:'🗑',render:()=>`
    <div class="app-title">/home/josemi/.trash</div>
@@ -130,20 +149,28 @@ const Apps={
 
  motivation:{title:'motivation.exe',icon:'💡',render:()=>`<div style="text-align:center;padding:2rem 1rem"><div style="font-size:2.5rem">💡</div><p style="font-family:var(--font-mono);margin-top:1rem;line-height:1.8">Keep building.<br>You are closer than you think.</p></div>`}
 };
+// Genera el HTML repetido de una barra de habilidad; data-w guarda el porcentaje.
 function bar(n,v){return `<div class="res"><div class="res__top"><span>${n}</span><span>${v}%</span></div><div class="bar"><i data-w="${v}"></i></div></div>`;}
 
-/* ========================================================= WINDOW MANAGER */
+/* ========================================================= WINDOW MANAGER
+   Es una IIFE: la función se ejecuta inmediatamente y solo expone openWindow y
+   closeWindow. Así, variables internas como z y open no contaminan el ámbito global.
+   ========================================================= */
 const WM=(()=>{let z=10,open=new Map(),x=40,y=30;
+  // Desplaza cada ventana nueva para que no aparezcan todas exactamente superpuestas.
   const nextPos=()=>{x+=28;y+=28;if(x>200)x=40;if(y>160)y=30;return{x,y};};
+  // Un z-index mayor coloca la ventana enfocada delante de las demás.
   function focus(win){win.style.zIndex=++z;$$('.tb-app').forEach(t=>t.classList.remove('active'));
     const c=$(`.tb-app[data-id="${win.dataset.id}"]`);if(c){c.classList.add('active');c.classList.remove('dim');}}
   function openWindow(id){const app=Apps[id];if(!app)return;
+    // Map permite saber si la app ya está abierta y evita crear duplicados.
     if(open.has(id)){const o=open.get(id);if(o.minimized){o.el.classList.remove('minimized');o.minimized=false;}focus(o.el);beep();return o.el;}
     const p=nextPos(),win=document.createElement('section');win.className='window';win.dataset.id=id;
     win.style.left=p.x+'px';win.style.top=p.y+'px';win.style.zIndex=++z;
     win.innerHTML=`<div class="win__bar"><div class="win__title"><span class="t-ico">${app.icon}</span> ${app.title}</div>
       <div class="win__btns"><button class="win-btn min"></button><button class="win-btn max"></button><button class="win-btn close"></button></div></div>
       <div class="win__body"></div><div class="win__resize"></div>`;
+    // Primero insertamos el HTML; después bind() puede buscar sus elementos y añadir eventos.
     $('#desktop').appendChild(win);$('.win__body',win).innerHTML=app.render();if(app.bind)app.bind($('.win__body',win),win);
     requestAnimationFrame(()=>win.classList.add('open'));
     $('.close',win).onclick=()=>closeWindow(id);
@@ -159,11 +186,13 @@ const WM=(()=>{let z=10,open=new Map(),x=40,y=30;
     b.onclick=()=>{const o=open.get(id);if(!o)return;if(o.minimized){o.el.classList.remove('minimized');o.minimized=false;focus(o.el);}
       else if(o.el.style.zIndex==z){o.el.classList.add('minimized');o.minimized=true;b.classList.add('dim');}else focus(o.el);};
     $('#taskbar__apps').appendChild(b);}
+  // pointerdown guarda la posición inicial; pointermove calcula el desplazamiento del ratón.
   function drag(win,h){h.addEventListener('pointerdown',e=>{if(e.target.closest('.win-btn'))return;if(win.classList.contains('maximized'))return;
     focus(win);const sx=e.clientX,sy=e.clientY,ox=win.offsetLeft,oy=win.offsetTop;
     const mv=ev=>{let nx=Math.max(0,Math.min(ox+ev.clientX-sx,innerWidth-120)),ny=Math.max(0,Math.min(oy+ev.clientY-sy,innerHeight-120));win.style.left=nx+'px';win.style.top=ny+'px';};
     const up=()=>{document.removeEventListener('pointermove',mv);document.removeEventListener('pointerup',up);};
     document.addEventListener('pointermove',mv);document.addEventListener('pointerup',up);});}
+  // El tirador inferior derecho modifica ancho y alto respetando tamaños mínimos.
   function resize(win,h){h.addEventListener('pointerdown',e=>{if(win.classList.contains('maximized'))return;e.stopPropagation();focus(win);
     const sx=e.clientX,sy=e.clientY,ow=win.offsetWidth,oh=win.offsetHeight;
     const mv=ev=>{win.style.width=Math.max(280,Math.min(ow+ev.clientX-sx,innerWidth-win.offsetLeft-10))+'px';
@@ -175,6 +204,7 @@ const openWindow=WM.openWindow;
 
 /* ========================================================= TERMINAL */
 function runCommand(raw,print,openWin){const p=raw.split(' '),c=p[0],a=p.slice(1).join(' ');
+  // switch selecciona una respuesta según la primera palabra escrita por el usuario.
   switch(c){case'':break;
     case'help':print('Comandos: <span class="ok">help whoami about projects skills contact clear date echo ls cat sudo secret matrix coffee hello</span>');break;
     case'whoami':print('Josemi<br>DAM Student<br>Developer in progress.');break;
@@ -194,6 +224,7 @@ function runCommand(raw,print,openWin){const p=raw.split(' '),c=p[0],a=p.slice(1
     case'hello':print('Hello, human.');break;
     default:print(`<span class="err">command not found: ${c}</span>`);}}
 function matrixMode(){const c=document.createElement('canvas');Object.assign(c.style,{position:'fixed',inset:'0',zIndex:'9998',background:'#000',opacity:'.9'});
+  // Canvas dibuja muchos caracteres con rapidez sin crear cientos de elementos HTML.
   document.body.appendChild(c);const x=c.getContext('2d');c.width=innerWidth;c.height=innerHeight;
   const cols=Math.floor(c.width/16),drops=Array(cols).fill(0),ch='アイウエオ01JOSEMI<>/*';
   const iv=setInterval(()=>{x.fillStyle='rgba(0,0,0,.06)';x.fillRect(0,0,c.width,c.height);x.fillStyle='#4ade80';x.font='14px monospace';
@@ -201,12 +232,14 @@ function matrixMode(){const c=document.createElement('canvas');Object.assign(c.s
   setTimeout(()=>{clearInterval(iv);c.remove();},5000);}
 
 /* ========================================================= PROYECTOS */
+// Los datos están separados de la vista para poder añadir proyectos sin duplicar HTML.
 const PROJECTS={
  java:{name:'Java Basics',desc:'Prácticas de POO en Java: clases, herencia, colecciones.',lang:'Java',db:'—',fw:'—',date:'2024',status:'done',tags:['Java','OOP']},
  web:{name:'JOSEMI OS',desc:'Este mismo portfolio-sistema. HTML/CSS/JS vanilla.',lang:'HTML/CSS/JS',db:'—',fw:'CSS Grid',date:'2025',status:'dev',tags:['Web','Vanilla JS']},
  exp:{name:'Experiments',desc:'Prototipos rápidos para aprender tecnologías nuevas.',lang:'Varios',db:'—',fw:'Varios',date:'2025',status:'exp',tags:['R&D']},
  school:{name:'School Projects',desc:'Trabajos de 1º DAM: bases de datos, apps, etc.',lang:'Java/SQL',db:'PostgreSQL',fw:'—',date:'2024',status:'done',tags:['DAM']}};
 function openProject(k){const p=PROJECTS[k];if(!p)return;const id='proj-'+k;
+  // Se crea una aplicación temporal reutilizando el mismo gestor de ventanas.
   Apps[id]={title:p.name,icon:'📂',render:()=>`<div class="app-title">${p.name.toUpperCase()}</div><p class="bio">${p.desc}</p>
     <div class="proj">${p.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
     <dl class="kv"><dt>Language</dt><dd>${p.lang}</dd><dt>Database</dt><dd>${p.db}</dd><dt>Framework</dt><dd>${p.fw}</dd><dt>Date</dt><dd>${p.date}</dd></dl>
@@ -216,6 +249,7 @@ function openProject(k){const p=PROJECTS[k];if(!p)return;const id='proj-'+k;
 
 /* ========================================================= BOOT */
 const BOOTL=['Initializing kernel...','Loading user profile...','Loading projects...','Loading skills...','Starting interface...'];
+// async/await hace que la secuencia temporal se lea de arriba abajo.
 async function boot(){const log=$('#boot__log');log.innerHTML='';$('#boot').classList.remove('out','hidden','glitch');
   for(const l of BOOTL){await sleep(380);log.innerHTML+=`<div><span class="ok">[ OK ]</span> ${l}</div>`;}
   await sleep(500);log.innerHTML+=`<div class="granted">ACCESS GRANTED</div>`;await sleep(700);
@@ -232,9 +266,12 @@ async function boot(){const log=$('#boot__log');log.innerHTML='';$('#boot').clas
 }
 
 /* ========================================================= ESCRITORIO */
+// Esta lista controla qué aplicaciones aparecen como iconos y dentro del menú Inicio.
 const ICONS=['about','projects','skills','terminal','readme','contact','trash','settings','system'];
+// Los iconos no están escritos en HTML: se generan a partir del objeto Apps.
 let startTime=Date.now();
 function buildIcons(){const c=$('#icons');c.innerHTML='';
+  // Un perfil puede limitar las aplicaciones visibles; sin sesión se muestran todas.
   const llista=(currentUser&&currentUser.apps)?currentUser.apps:ICONS;
   llista.forEach(id=>{const a=Apps[id];if(!a)return;
     const el=document.createElement('div');el.className='icon';el.dataset.id=id;el.tabIndex=0;
@@ -248,6 +285,7 @@ function buildMenu(){const m=$('#menu__apps');m.innerHTML='';
   llista.forEach(id=>{const a=Apps[id];if(!a)return;
     const b=document.createElement('button');b.innerHTML=`<span>${a.icon}</span> ${a.title}`;
     b.onclick=()=>{openWindow(id);$('#menu').classList.add('hidden');};m.appendChild(b);});}
+// tick se ejecuta ahora y luego cada segundo para mantener reloj y uptime actualizados.
 function buildClock(){const t=$('#clock__time'),d=$('#clock__date');const tick=()=>{const n=new Date();
   t.textContent=`${pad(n.getHours())}:${pad(n.getMinutes())}`;d.textContent=n.toLocaleDateString('es-ES',{weekday:'short',day:'numeric',month:'short'});
   const st=$('#sys-uptime');if(st)st.textContent=Math.floor((n-startTime)/1000)+'s';const sc=$('#sys-time');if(sc)sc.textContent=t.textContent;};tick();setInterval(tick,1000);}
@@ -261,6 +299,7 @@ function buildStart(){const m=$('#menu');$('#start').onclick=e=>{e.stopPropagati
   document.addEventListener('click',e=>{if(!e.target.closest('#menu')&&!e.target.closest('#start'))m.classList.add('hidden');});
   $$('.menu__power button').forEach(b=>b.onclick=()=>{m.classList.add('hidden');b.dataset.power==='shutdown'?shutdown():boot();});}
 function buildContext(){const ctx=$('#ctxmenu');
+  // preventDefault cancela el menú habitual del navegador para mostrar el nuestro.
   document.addEventListener('contextmenu',e=>{if(e.target.closest('.window,.menu,.taskbar'))return;e.preventDefault();
     ctx.classList.remove('hidden');const w=ctx.offsetWidth,h=ctx.offsetHeight;
     ctx.style.left=Math.min(e.clientX,innerWidth-w-8)+'px';ctx.style.top=Math.min(e.clientY,innerHeight-h-8)+'px';});
@@ -275,7 +314,9 @@ function shutdown(){const s=$('#shutdown');s.classList.remove('hidden');$('#shut
 function buildKonami(){const s=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];let i=0;
   addEventListener('keydown',e=>{if(e.key===s[i])i++;else if(e.key===s[0])i=1;else i=0;if(i===s.length){toast('Developer Mode Enabled.');i=0;}});}
 
-/* ========================================================= MULTIUSUARI */
+/* ========================================================= PERFILES
+   Cada contraseña selecciona un perfil, su color y las aplicaciones permitidas.
+   ========================================================= */
 const USERS={
   "josemi":  {nom:"Josemi",  rol:"propietari",   color:"#6C63FF", apps:["about","projects","skills","terminal","readme","contact","trash","settings","system"], auto:[]},
   "invitado":{nom:"Invitado",rol:"convidat",     color:"#008080", apps:["about","contact"], auto:["about"]},
@@ -284,13 +325,116 @@ const USERS={
 };
 let currentUser=null;
 
-function showLogin(){const l=$('#login');l.classList.remove('hidden','out');
-  $('#loginPass').value='';$('#loginErr').textContent='';$('#loginGo').disabled=true;setTimeout(()=>$('#loginPass').focus(),250);}
+/* ========================================================= LOGIN */
+const ASCII_FX_DURATION=3600;
+const clamp01=n=>Math.max(0,Math.min(1,n));
+const easeOutCubic=n=>1-Math.pow(1-n,3);
 
+// Devuelve un número estable entre 0 y 1 para cada coordenada. Parece aleatorio,
+// pero siempre produce la misma película y evita que el dibujo parpadee sin control.
+function asciiSeed(x,y,salt=0){return ((x*73+y*151+salt*199+x*y*17)%997)/997;}
+
+// Produce un fotograma de texto. Cada carácter viaja desde una coordenada inicial
+// hasta su posición definitiva, como hacen los motores de efectos de terminal.
+function renderLoginFrame(text,kind,elapsed){
+  // Devolver el texto original elimina espacios auxiliares cuando una fase termina.
+  if((kind==='computer'&&elapsed>=2180)||(kind==='logo'&&elapsed>=3300))return text;
+  const rows=text.split('\n'),width=Math.max(...rows.map(row=>row.length)),height=rows.length;
+  const canvas=Array.from({length:height},()=>Array(width).fill(' '));
+  const noise='01#$%?+*:/\\';
+
+  rows.forEach((row,y)=>[...row].forEach((char,x)=>{
+    if(char===' ')return;
+    const seed=asciiSeed(x,y,kind==='computer'?1:2);
+
+    if(kind==='computer'){
+      if(char==='0'||char==='1'){
+        // La calavera aparece después del chasis y atraviesa una fase de descifrado.
+        const age=elapsed-(720+seed*380);
+        if(age<0)return;
+        if(age<920){
+          const symbol=noise[(Math.floor(age/48)+x*5+y*3)%noise.length];
+          canvas[y][x]=symbol;
+        }else canvas[y][x]=char;
+        return;
+      }
+
+      // Las piezas del ordenador llegan desde los bordes y frenan al encajar.
+      const local=clamp01((elapsed-seed*320)/820);
+      if(local<=0)return;
+      const side=Math.floor(seed*4),sx=side===0?0:side===1?width-1:Math.floor(seed*width);
+      const sy=side===2?0:side===3?height-1:Math.floor(asciiSeed(x,y,8)*height);
+      const ease=easeOutCubic(local);
+      const px=Math.round(sx+(x-sx)*ease),py=Math.round(sy+(y-sy)*ease);
+      canvas[py][px]=local<.72?noise[(x+y+Math.floor(elapsed/55))%noise.length]:char;
+      return;
+    }
+
+    // El logotipo empieza cuando el ordenador ya está construido. Sus caracteres
+    // convergen desde posiciones dispersas y se descifran justo antes de asentarse.
+    const local=clamp01((elapsed-(2180+seed*260))/820);
+    if(local<=0)return;
+    if(local>=1){canvas[y][x]=char;return;}
+    const sx=Math.floor(asciiSeed(x,y,4)*width),sy=Math.floor(asciiSeed(x,y,9)*height);
+    const ease=easeOutCubic(local),px=Math.round(sx+(x-sx)*ease),py=Math.round(sy+(y-sy)*ease);
+    canvas[py][px]=local>.78?char:noise[(x*3+y+Math.floor(elapsed/50))%noise.length];
+  }));
+
+  // Un pequeño fallo horizontal atraviesa la pantalla después del descifrado.
+  if(kind==='computer'&&elapsed>1760&&elapsed<2180){
+    const band=Math.floor((elapsed-1760)/70)%Math.max(1,height-4)+2;
+    for(let y=band;y<Math.min(height,band+2);y++){
+      const shift=y%2?2:-2,row=canvas[y].slice();
+      canvas[y].fill(' ');
+      row.forEach((char,x)=>{const nx=x+shift;if(nx>=0&&nx<width)canvas[y][nx]=char;});
+    }
+  }
+  return canvas.map(row=>row.join('')).join('\n');
+}
+
+function typeLoginArt(){
+  const login=$('#login'),status=$('#loginSequenceText'),bar=$('#loginSequenceBar');
+  login.classList.remove('ascii-ready');login.classList.add('ascii-intro');
+
+  // El span invisible reserva el tamaño final; el visible cambia en cada fotograma.
+  // Esto evita que formulario y texto salten mientras aparece el dibujo.
+  const parts=$$('.login__computer,.login__ascii').map(el=>{
+    const text=el.textContent,spacer=document.createElement('span'),ink=document.createElement('span');
+    spacer.textContent=text;spacer.className='ascii-spacer';spacer.setAttribute('aria-hidden','true');
+    ink.className='ascii-ink';ink.setAttribute('aria-hidden','true');
+    el.classList.add('ascii-typing');el.replaceChildren(spacer,ink);
+    return {el,text,ink,kind:el.classList.contains('login__computer')?'computer':'logo'};
+  });
+  const started=performance.now();
+  function finish(){
+    for(const part of parts){part.el.textContent=part.text;part.el.classList.remove('ascii-typing');}
+    login.classList.remove('ascii-intro','ascii-pulse','ascii-glitch');login.classList.add('ascii-ready');
+    status.textContent='[ ACCESS TERMINAL READY ]';bar.textContent='[########################] 100%';
+    setTimeout(()=>$('#loginPass').focus(),180);
+  }
+  // requestAnimationFrame sincroniza la actualización con el refresco de la pantalla.
+  function frame(now){
+    const elapsed=now-started,progress=clamp01(elapsed/ASCII_FX_DURATION);
+    if(elapsed>=ASCII_FX_DURATION||login.classList.contains('out')||login.classList.contains('hidden')){finish();return;}
+    for(const part of parts)part.ink.textContent=renderLoginFrame(part.text,part.kind,elapsed);
+
+    login.classList.toggle('ascii-pulse',elapsed>1320&&elapsed<1710||elapsed>3020&&elapsed<3300);
+    login.classList.toggle('ascii-glitch',elapsed>1760&&elapsed<2180&&Math.floor(elapsed/70)%2===0);
+    status.textContent=elapsed<650?'> WAKE SIGNAL RECEIVED_':elapsed<1320?'> BUILDING ASCII DISPLAY...':elapsed<2180?'> DECRYPTING BINARY CORE...':elapsed<3100?'> LOADING JOSEMI_OS...':'> VERIFYING ACCESS TERMINAL...';
+    const filled=Math.round(progress*24);
+    bar.textContent=`[${'#'.repeat(filled)}${'.'.repeat(24-filled)}] ${String(Math.round(progress*100)).padStart(3,' ')}%`;
+    requestAnimationFrame(frame);
+  }
+  for(const part of parts)part.ink.textContent=renderLoginFrame(part.text,part.kind,0);
+  requestAnimationFrame(frame);
+}
+function showLogin(){const l=$('#login');l.classList.remove('hidden','out');
+  $('#loginPass').value='';$('#loginErr').textContent='';$('#loginGo').disabled=true;typeLoginArt();}
 function initLogin(){
   const login=$('#login'),pass=$('#loginPass'),go=$('#loginGo'),eye=$('#loginEye'),err=$('#loginErr');
   pass.addEventListener('input',()=>{go.disabled=pass.value.length===0;});
-  eye.addEventListener('click',()=>{const show=pass.type==='password';pass.type=show?'text':'password';eye.textContent=show?'🙈':'👁';});
+  eye.addEventListener('click',()=>{const show=pass.type==='password';pass.type=show?'text':'password';eye.textContent=show?'[-]':'[*]';eye.setAttribute('aria-label',show?'Ocultar contraseña':'Mostrar contraseña');});
+  // Escuchamos submit en el formulario para admitir tanto clic como tecla Enter.
   $('#loginForm').addEventListener('submit',e=>{e.preventDefault();
     const u=USERS[pass.value];
     if(!u){login.classList.remove('shake');void login.offsetWidth;login.classList.add('shake');
@@ -298,14 +442,17 @@ function initLogin(){
     currentUser=u;
     document.documentElement.style.setProperty('--accent',u.color);
     $('.menu__head strong').textContent=u.nom;
-    $('.login__user').textContent=u.nom;
-    $('.login__avatar').textContent=u.nom[0].toUpperCase();
+    $('.menu__head small').textContent=u.rol;
+    buildIcons();buildMenu();
     beep();
     login.classList.add('out');setTimeout(()=>login.classList.add('hidden'),600);
     boot();
   });
-  setTimeout(()=>pass.focus(),300);
+  // El foco se asigna al terminar la animación para que el cursor no distraiga antes.
 }
 
-/* ========================================================= INICIO */
-buildIcons();buildMenu();buildClock();buildParallax();buildCursor();buildStart();buildContext();buildKonami();initLogin();
+/* ========================================================= INICIO
+   Estas llamadas arrancan cada módulo una sola vez cuando el navegador termina
+   de leer script.js. El archivo se carga al final de body, por eso el DOM ya existe.
+   ========================================================= */
+buildIcons();buildMenu();buildClock();buildParallax();buildCursor();buildStart();buildContext();buildKonami();initLogin();typeLoginArt();

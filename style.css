@@ -1,18 +1,28 @@
 /* ============================================================
    JOSEMI OS · base del sistema (tema "glass" original)
+
+   CÓMO LEER ESTE CSS
+   - Un selector indica qué elemento se modifica: .clase, #id o etiqueta.
+   - Las propiedades dentro de { } describen su aspecto y posición.
+   - La cascada da prioridad a reglas posteriores y más específicas.
+   - Al final hay un "skin" Windows 95 que sobrescribe el tema base.
    ============================================================ */
+/* Variables reutilizables: cambiar un valor aquí actualiza todos los var(--nombre). */
 :root{
   --bg:#050505; --panel:#0c0c0f; --panel-2:#101016;
   --text:#f5f5f5; --muted:#888888; --line:rgba(255,255,255,.08);
   --accent:#6C63FF; --accent-2:#00C8FF; --glass:rgba(16,16,22,.62);
   --radius:14px; --font-ui:'Space Grotesk','Inter',sans-serif; --font-mono:'JetBrains Mono','Fira Code',monospace;
 }
+/* Reset básico. border-box incluye padding y borde dentro del ancho declarado. */
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%}
 body{background:var(--bg);color:var(--text);font-family:var(--font-ui);overflow:hidden;-webkit-font-smoothing:antialiased}
+/* JavaScript añade o quita esta clase para controlar qué pantalla se muestra. */
 .hidden{display:none!important}
 button{font-family:inherit;cursor:pointer}
 
+/* fixed + inset hacen que el fondo cubra siempre toda la ventana del navegador. */
 #bg{position:fixed;inset:-20%;z-index:0;background:
   radial-gradient(40% 40% at 30% 30%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 70%),
   radial-gradient(45% 45% at 75% 65%, color-mix(in srgb, var(--accent-2) 18%, transparent), transparent 70%), var(--bg);
@@ -21,6 +31,7 @@ button{font-family:inherit;cursor:pointer}
   background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
   background-size:48px 48px;mask-image:radial-gradient(80% 80% at 50% 40%,#000,transparent)}
 
+/* pointer-events:none evita que el cursor decorativo bloquee clics reales. */
 #cursor{position:fixed;top:0;left:0;width:26px;height:26px;border-radius:50%;border:1px solid var(--accent);
   pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .2s,height .2s,background .2s;mix-blend-mode:screen}
 #cursor.hover{width:46px;height:46px;background:color-mix(in srgb,var(--accent) 12%,transparent)}
@@ -43,11 +54,13 @@ button{font-family:inherit;cursor:pointer}
 .icon:hover{background:rgba(255,255,255,.06)}
 .icon.sel{background:color-mix(in srgb,var(--accent) 22%,transparent);outline:1px solid var(--accent)}
 
+/* Las ventanas usan position:absolute porque JavaScript cambia left, top, width y height. */
 .window{position:absolute;min-width:280px;min-height:180px;width:560px;height:420px;background:var(--glass);
   backdrop-filter:blur(18px) saturate(140%);-webkit-backdrop-filter:blur(18px) saturate(140%);
   border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 24px 60px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.05);
   display:flex;flex-direction:column;overflow:hidden;transform:scale(.95);opacity:0;transition:transform .22s ease,opacity .22s ease}
 .window.open{transform:scale(1);opacity:1}
+/* Las clases de estado permiten representar maximizada/minimizada sin recrear la ventana. */
 .window.maximized{left:0!important;top:0!important;width:100%!important;height:100%!important;border-radius:0}
 .window.maximized .win__resize{display:none}
 .window.minimized{display:none}
@@ -152,6 +165,7 @@ select{background:var(--panel-2);color:var(--text);border:1px solid var(--line);
 .toast{background:var(--glass);backdrop-filter:blur(16px);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;padding:.7rem 1rem;font-size:.82rem;box-shadow:0 10px 30px rgba(0,0,0,.5);animation:slidein .3s ease}
 @keyframes slidein{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
 
+/* Media query: en pantallas estrechas cada ventana ocupa todo el espacio disponible. */
 @media (max-width:768px){
   .window{position:fixed!important;inset:0!important;width:100%!important;height:100%!important;border-radius:0!important;left:0!important;top:0!important}
   .win__bar{cursor:default}.win__resize{display:none}
@@ -212,6 +226,9 @@ body.reduce-motion #bg{transition:none}
 
 /* ============================================================
    SKIN: WINDOWS 95  (override del tema — va al final)
+
+   Estas reglas aparecen después del tema base para aprovechar la cascada.
+   !important gana a declaraciones anteriores cuando la especificidad no basta.
    ============================================================ */
 :root{
   --font-ui: Tahoma, "MS Sans Serif", "Segoe UI", sans-serif;
@@ -224,6 +241,7 @@ body{font-family:var(--font-ui)}
 #bg{filter:none!important;transform:none!important}
 #bg::after{display:none!important}
 
+/* El estilo Win95 usa esquinas rectas y bordes claros/oscuros para simular relieve. */
 .window,.menu,.ctx,.toast,.login__card,.taskbar__start,.tb-app,
 .btn,.win-btn,.login__field input,.login__field button{border-radius:0!important}
 
@@ -251,6 +269,7 @@ body{font-family:var(--font-ui)}
   box-shadow:inset -1px -1px 0 var(--w95-gray), inset 1px 1px 0 #dfdfdf;
   transform:none!important;filter:none!important}
 .win-btn:hover{transform:none!important;filter:none!important}
+/* Al pulsar se invierten los colores del borde y el botón parece hundirse. */
 .win-btn:active{border-top-color:var(--w95-black)!important;border-left-color:var(--w95-black)!important;
   border-right-color:var(--w95-white)!important;border-bottom-color:var(--w95-white)!important;box-shadow:inset 1px 1px 0 var(--w95-gray)}
 .win-btn.min::before{content:'_';margin-top:4px}
@@ -276,6 +295,7 @@ body{font-family:var(--font-ui)}
 .icon.sel{background:transparent!important;outline:none!important}
 .icon.sel .lbl{background:var(--w95-blue);color:#fff;outline:1px dotted #fff}
 
+/* La barra queda fija abajo; los botones de ventanas se insertan en taskbar__apps. */
 .taskbar{background:var(--w95-silver)!important;backdrop-filter:none!important;
   border-top:2px solid var(--w95-white)!important;height:36px!important;box-shadow:inset 0 1px 0 #dfdfdf}
 .taskbar__start{background:var(--w95-silver)!important;color:#000!important;font-weight:700;font-size:12px;
@@ -335,13 +355,18 @@ body{font-family:var(--font-ui)}
   border-right-color:var(--w95-white);border-bottom-color:var(--w95-white);box-shadow:inset 1px 1px 0 var(--w95-gray)}
 .btn--accent{background:var(--w95-silver)!important;color:#000!important}
 
-.login{background:var(--w95-teal)!important;backdrop-filter:none!important}
+.login{background:#000!important;backdrop-filter:none!important}
 .login__card{background:var(--w95-silver)!important;
   border-top:2px solid var(--w95-white)!important;border-left:2px solid var(--w95-white)!important;
   border-right:2px solid var(--w95-black)!important;border-bottom:2px solid var(--w95-black)!important;
   box-shadow:inset -1px -1px 0 var(--w95-gray), inset 1px 1px 0 #dfdfdf, 4px 4px 0 rgba(0,0,0,.3)!important;
   padding:1.5rem!important;animation:none!important}
-.login__avatar{border-radius:0!important;background:var(--w95-silver)!important;color:#000!important;border:2px inset var(--w95-gray);font-family:var(--font-ui)}
+.login__computer{display:block;width:min(280px,100%);height:auto;image-rendering:pixelated}
+.login__ascii{display:block;font-family:'Courier New',monospace;font-size:clamp(8px,2.1vw,12px);font-weight:700;line-height:1.15;white-space:pre;text-align:left;letter-spacing:0}
+.login__card{max-width:calc(100vw - 32px)}
+.login__form{max-width:100%}
+.login{overflow-y:auto;padding:32px 16px 64px}
+@media(max-height:640px){.login{justify-content:flex-start}.login__brand{position:static}.login__computer{width:180px}}
 .login__user{color:#000!important}
 .login__field input{background:#fff!important;color:#000!important;border:none!important;
   box-shadow:inset 1px 1px 0 var(--w95-black), inset -1px -1px 0 var(--w95-white), inset 2px 2px 0 var(--w95-gray)!important;font-family:var(--font-ui)}
@@ -370,3 +395,49 @@ body{font-family:var(--font-ui)}
   .window{inset:0!important;width:100%!important;height:100%!important}
   .win__resize{display:none}
 }
+
+/* ============================================================
+   INICIO ASCII CON ASPECTO DE TERMINAL
+   Estas reglas son las últimas a propósito: convierten solamente el login Win95
+   en una terminal negra sin cambiar el aspecto del escritorio posterior.
+   ============================================================ */
+.login .login__card{background:#000!important;color:#ddd;border:0!important;box-shadow:none!important;padding:0!important;max-width:100%;gap:1.4rem}
+.login .login__computer,.login .login__ascii{display:block;width:auto;height:auto;font-family:'Courier New',monospace;font-size:clamp(6px,2vw,12px);font-weight:400;line-height:1.15;white-space:pre;text-align:left;letter-spacing:0;color:#ddd}
+.login{font-family:'Courier New',monospace}
+.login .login__user{color:#ddd!important}
+.login__field{border-bottom:1px solid #777}
+.login__field::before{content:'>';color:#aaa;margin-right:8px}
+.login .login__field input{background:#000!important;color:#ddd!important;border:none!important;box-shadow:none!important;font-family:inherit;caret-color:#fff;padding-left:0}
+.login .login__field input:focus{box-shadow:none!important;outline:none}
+.login__field:focus-within{border-color:#fff}
+.login #loginGo,.login #loginEye{background:#000!important;color:#ddd!important;border:0;box-shadow:none;font-family:inherit;font-size:14px}
+.login #loginGo:disabled{opacity:.35}
+.login #loginGo:focus-visible,.login #loginEye:focus-visible{outline:1px dashed #fff}
+.login .login__hint{color:#999!important}
+.login .login__err{color:#eee!important}
+.login .login__hint span{color:#ddd!important;font-family:inherit}
+.login .login__brand{color:#777;font-family:inherit}
+.login__sequence{width:min(360px,90vw);display:flex;flex-direction:column;gap:.35rem;color:#8f8f8f;font-size:10px;line-height:1.2;letter-spacing:.06em}
+#loginSequenceBar{color:#d7d7d7;white-space:pre}
+/* clamp(mínimo, flexible, máximo) hace que el ASCII se adapte sin deformarse. */
+.login .login__computer{font-size:clamp(5px,1.15vw,8px);line-height:1.08}
+.login .login__ascii{font-size:clamp(6px,1.7vw,11px)}
+/* Las dos capas ocupan la misma celda: spacer reserva espacio e ink se anima encima. */
+.login .ascii-typing{display:grid}
+.ascii-spacer,.ascii-ink{grid-area:1 / 1}
+.ascii-spacer{visibility:hidden}
+.login.ascii-intro .login__form,.login.ascii-intro .login__hint,.login.ascii-intro .login__err{opacity:0;transform:translateY(6px);pointer-events:none}
+.login.ascii-ready .login__form,.login.ascii-ready .login__hint,.login.ascii-ready .login__err{opacity:1;transform:none;pointer-events:auto;transition:opacity .35s ease,transform .35s ease}
+.login.ascii-intro .ascii-ink{color:#00e85a;text-shadow:0 0 4px rgba(0,255,90,.8),0 0 11px rgba(0,255,70,.38);animation:matrixFlicker .82s steps(1,end) infinite!important}
+.login.ascii-intro .login__sequence{color:#00a943}
+.login.ascii-intro #loginSequenceBar{color:#00f260;text-shadow:0 0 7px rgba(0,255,80,.55)}
+.login.ascii-pulse .ascii-ink{color:#a4ffbd;text-shadow:0 0 5px #36ff76,0 0 16px rgba(0,255,80,.9);animation-duration:.18s!important}
+.login.ascii-ready .login__ascii{color:#7dff9e;text-shadow:0 0 8px rgba(0,255,80,.3)}
+@keyframes matrixFlicker{
+  0%,7%,12%,46%,52%,76%,100%{opacity:1}
+  8%,48%{opacity:.38;text-shadow:none}
+  10%,50%,78%{opacity:.72}
+  77%{opacity:.18;transform:translateX(1px)}
+}
+.login.ascii-glitch .login__computer{transform:translateX(1px);filter:contrast(1.35)}
+@media(max-height:700px){.login{justify-content:flex-start}.login .login__brand{position:static}}
