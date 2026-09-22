@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="JOSEMI OS — un sistema operativo para explorar mi portfolio.">
+<title>JOSEMI OS</title>
+<link rel="icon" type="img/png" href="img/pc.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="bg" aria-hidden="true"></div>
+  <div id="cursor" aria-hidden="true"></div>
+
+  <!-- LOGIN -->
+  <div id="login" class="login">
+    <div class="login__card">
+      <div class="login__avatar">J</div>
+      <h2 class="login__user">Josemi</h2>
+      <form class="login__form" id="loginForm" autocomplete="off">
+        <div class="login__field">
+          <input type="password" id="loginPass" placeholder="Password" autocomplete="off">
+          <button type="button" id="loginEye" aria-label="Mostrar contraseña">👁</button>
+          <button type="submit" id="loginGo" aria-label="Entrar" disabled>→</button>
+        </div>
+      </form>
+      <p class="login__hint">Pista: <span id="loginHint">josemi</span></p>
+      <p class="login__err" id="loginErr"></p>
+    </div>
+    <p class="login__brand">JOSEMI OS · v1.0</p>
+  </div>
+
+  <!-- BOOT -->
+  <div id="boot" class="boot hidden">
+    <pre class="boot__ascii">   ___   _____  ___  ___  __  __   ___
+  | _ \ |_   _||_ _|| _ \|  \/  | / _ \
+  |   /   | |   | | |   /| |\/| || (_) |
+  |_|_\   |_|  |___||_|_\|_|  |_| \___/
+
+        JOSEMI OS  ·  Version 1.0</pre>
+    <div id="boot__log" class="boot__log"></div>
+  </div>
+
+  <!-- SPLASH (opcional, pero incluido) -->
+  <div id="splash" class="splash hidden">
+    <div class="splash__logo"></div>
+    <div class="splash__txt"><b>Windows</b> <span>95</span></div>
+    <div class="splash__bar"><i></i></div>
+  </div>
+
+  <!-- ESCRITORIO -->
+  <main id="desktop" class="desktop hidden">
+    <div class="icons" id="icons"></div>
+
+    <div id="menu" class="menu hidden">
+      <div class="menu__head"><span class="menu__avatar">J</span><div><strong>Josemi</strong><small>DAM Student</small></div></div>
+      <div class="menu__label">Applications</div>
+      <div class="menu__apps" id="menu__apps"></div>
+      <div class="menu__power"><button data-power="restart">↻ Restart</button><button data-power="shutdown">⏻ Shutdown</button></div>
+    </div>
+
+    <div id="ctxmenu" class="ctx hidden">
+      <button data-act="refresh">↻ Refresh</button>
+      <button data-act="wallpaper">🖼 Change Wallpaper</button>
+      <button data-act="terminal">💻 Open Terminal</button>
+      <button data-act="system">🖥 System Info</button>
+    </div>
+
+    <footer class="taskbar">
+      <button id="start" class="taskbar__start"><span class="taskbar__logo">◈</span> JOSEMI</button>
+      <div class="taskbar__apps" id="taskbar__apps"></div>
+      <div class="taskbar__tray">
+        <span class="tray__item">📶</span><span class="tray__item">🔊</span><span class="tray__item">🔋 100%</span>
+        <span class="tray__clock"><span id="clock__time">--:--</span><small id="clock__date">—</small></span>
+      </div>
+    </footer>
+  </main>
+
+  <!-- SHUTDOWN -->
+  <div id="shutdown" class="shutdown hidden">
+    <p id="shutdown__msg">Shutting down JOSEMI OS...</p>
+    <button id="reboot" class="hidden">REBOOT</button>
+  </div>
+
+  <div id="toasts" class="toasts" aria-live="polite"></div>
+  <script src="script.js"></script>
+</body>
+</html>
