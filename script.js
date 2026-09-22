@@ -222,40 +222,32 @@ async function boot(){const log=$('#boot__log');log.innerHTML='';$('#boot').clas
   $('#boot').classList.add('out');await sleep(500);$('#boot').classList.add('hidden');
   const sp=$('#splash'); sp.classList.remove('hidden');await sleep(1600);
   sp.classList.add('out');await sleep(500);sp.classList.add('hidden');
-  $('#desktop').classList.remove('hidden');}
-    $('#desktop').classList.remove('hidden');
+  $('#desktop').classList.remove('hidden');
   if(currentUser){
-    (currentUser.auto||[]).forEach(a=>openWindow(a));          // apps que s'obrin soles
-    if(currentUser.mode==='matrix') matrixMode();              // mode Matrix
-    if(currentUser.mode==='dev')    toast('Mode administrador activat.');
+    (currentUser.auto||[]).forEach(a=>openWindow(a));
+    if(currentUser.mode==='matrix') matrixMode();
+    if(currentUser.mode==='dev') toast('Mode administrador activat.');
     toast('Benvingut, '+currentUser.nom+'.');
   }
 }
 
 /* ========================================================= ESCRITORIO */
-function buildIcons(){
-  const c=$('#icons'); c.innerHTML='';
-  const llista = (currentUser && currentUser.apps) ? currentUser.apps : ICONS;
-  llista.forEach(id=>{ const a=Apps[id]; if(!a)return;
-    const el=document.createElement('div');
-    el.className='icon'; el.dataset.id=id; el.tabIndex=0;
+const ICONS=['about','projects','skills','terminal','readme','contact','trash','settings','system'];
+let startTime=Date.now();
+function buildIcons(){const c=$('#icons');c.innerHTML='';
+  const llista=(currentUser&&currentUser.apps)?currentUser.apps:ICONS;
+  llista.forEach(id=>{const a=Apps[id];if(!a)return;
+    const el=document.createElement('div');el.className='icon';el.dataset.id=id;el.tabIndex=0;
     el.innerHTML=`<span class="glyph">${a.icon}</span><span class="lbl">${a.title}</span>`;
     el.addEventListener('click',()=>{$$('.icon').forEach(i=>i.classList.remove('sel'));el.classList.add('sel');});
     el.addEventListener('dblclick',()=>openWindow(id));
     el.addEventListener('keydown',e=>{if(e.key==='Enter')openWindow(id);});
-    c.appendChild(el);
-  });
-}
-function buildMenu(){
-  const m=$('#menu__apps'); m.innerHTML='';
-  const llista = (currentUser && currentUser.apps) ? currentUser.apps : ICONS;
-  llista.forEach(id=>{ const a=Apps[id]; if(!a)return;
-    const b=document.createElement('button');
-    b.innerHTML=`<span>${a.icon}</span> ${a.title}`;
-    b.onclick=()=>{openWindow(id);$('#menu').classList.add('hidden');};
-    m.appendChild(b);
-  });
-}
+    c.appendChild(el);});}
+function buildMenu(){const m=$('#menu__apps');m.innerHTML='';
+  const llista=(currentUser&&currentUser.apps)?currentUser.apps:ICONS;
+  llista.forEach(id=>{const a=Apps[id];if(!a)return;
+    const b=document.createElement('button');b.innerHTML=`<span>${a.icon}</span> ${a.title}`;
+    b.onclick=()=>{openWindow(id);$('#menu').classList.add('hidden');};m.appendChild(b);});}
 function buildClock(){const t=$('#clock__time'),d=$('#clock__date');const tick=()=>{const n=new Date();
   t.textContent=`${pad(n.getHours())}:${pad(n.getMinutes())}`;d.textContent=n.toLocaleDateString('es-ES',{weekday:'short',day:'numeric',month:'short'});
   const st=$('#sys-uptime');if(st)st.textContent=Math.floor((n-startTime)/1000)+'s';const sc=$('#sys-time');if(sc)sc.textContent=t.textContent;};tick();setInterval(tick,1000);}
@@ -283,55 +275,34 @@ function shutdown(){const s=$('#shutdown');s.classList.remove('hidden');$('#shut
 function buildKonami(){const s=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];let i=0;
   addEventListener('keydown',e=>{if(e.key===s[i])i++;else if(e.key===s[0])i=1;else i=0;if(i===s.length){toast('Developer Mode Enabled.');i=0;}});}
 
-/* =========================================================
-   MULTIEUSUARI — cada contrasenya obri una cosa
-   Edita esta llista: afegix/treu usuaris lliurement.
-   ========================================================= */
-const USERS = {
-  //  contrasenya  →  què fa
-  "josemi":   { nom:"Josemi",   rol:"propietari",    color:"#6C63FF",
-                apps:["about","projects","skills","terminal","readme","contact","trash","settings","system"],
-                auto:[] },
-  "invitado": { nom:"Invitado", rol:"convidat",      color:"#008080",
-                apps:["about","contact"], auto:["about"] },
-  "root":     { nom:"zoe",     rol:"administrador", color:"#4ade80",
-                apps:["about","projects","skills","terminal","readme","contact","trash","settings","system"],
-                auto:["terminal"], mode:"dev" },
-  "matrix":   { nom:"Agent",    rol:"despertar",     color:"#4ade80",
-                apps:["about","terminal"], auto:["terminal"], mode:"matrix" }
+/* ========================================================= MULTIUSUARI */
+const USERS={
+  "josemi":  {nom:"Josemi",  rol:"propietari",   color:"#6C63FF", apps:["about","projects","skills","terminal","readme","contact","trash","settings","system"], auto:[]},
+  "invitado":{nom:"Invitado",rol:"convidat",     color:"#008080", apps:["about","contact"], auto:["about"]},
+  "zoe":     {nom:"Zoe",     rol:"administrador",color:"#4ade80", apps:["about","projects","skills","terminal","readme","contact","trash","settings","system"], auto:["terminal"], mode:"dev"},
+  "matrix":  {nom:"Agent",   rol:"despertar",    color:"#4ade80", apps:["about","terminal"], auto:["terminal"], mode:"matrix"}
 };
+let currentUser=null;
 
-let currentUser = null;   // qui ha entrat ara mateix
-
-function showLogin(){
-  const l=$('#login'); l.classList.remove('hidden','out');
-  $('#loginPass').value=''; $('#loginErr').textContent=''; $('#loginGo').disabled=true;
-  setTimeout(()=>$('#loginPass').focus(),250);
-}
+function showLogin(){const l=$('#login');l.classList.remove('hidden','out');
+  $('#loginPass').value='';$('#loginErr').textContent='';$('#loginGo').disabled=true;setTimeout(()=>$('#loginPass').focus(),250);}
 
 function initLogin(){
-  const login=$('#login'), pass=$('#loginPass'), go=$('#loginGo'), eye=$('#loginEye'), err=$('#loginErr');
-  pass.addEventListener('input',()=>{ go.disabled = pass.value.length===0; });
-  eye.addEventListener('click',()=>{ const show=pass.type==='password'; pass.type=show?'text':'password'; eye.textContent=show?'🙈':'👁'; });
-
-  $('#loginForm').addEventListener('submit', e=>{
-    e.preventDefault();
-    const u = USERS[pass.value];          // 🔑 busca la contrasenya com a clau
-    if(!u){                                // no existeix → sacsejada
-      login.classList.remove('shake'); void login.offsetWidth; login.classList.add('shake');
-      err.textContent='Contrasenya incorrecta.'; pass.select(); beep();
-      return;
-    }
-    // ✅ encertat → personalitza i entra
-    currentUser = u;
-    document.documentElement.style.setProperty('--accent', u.color);   // el seu color
-    $('.menu__head strong').textContent = u.nom;                        // el seu nom al menú Start
-    $('.login__user').textContent = u.nom;                              // el nom al login
-    $('.login__avatar').textContent = u.nom[0].toUpperCase();           // inicial a l'avatar
+  const login=$('#login'),pass=$('#loginPass'),go=$('#loginGo'),eye=$('#loginEye'),err=$('#loginErr');
+  pass.addEventListener('input',()=>{go.disabled=pass.value.length===0;});
+  eye.addEventListener('click',()=>{const show=pass.type==='password';pass.type=show?'text':'password';eye.textContent=show?'🙈':'👁';});
+  $('#loginForm').addEventListener('submit',e=>{e.preventDefault();
+    const u=USERS[pass.value];
+    if(!u){login.classList.remove('shake');void login.offsetWidth;login.classList.add('shake');
+      err.textContent='Contrasenya incorrecta.';pass.select();beep();return;}
+    currentUser=u;
+    document.documentElement.style.setProperty('--accent',u.color);
+    $('.menu__head strong').textContent=u.nom;
+    $('.login__user').textContent=u.nom;
+    $('.login__avatar').textContent=u.nom[0].toUpperCase();
     beep();
-    login.classList.add('out');
-    setTimeout(()=>login.classList.add('hidden'),600);
-    boot();   // arrenca; ja llegirà currentUser
+    login.classList.add('out');setTimeout(()=>login.classList.add('hidden'),600);
+    boot();
   });
   setTimeout(()=>pass.focus(),300);
 }
