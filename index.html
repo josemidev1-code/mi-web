@@ -12,7 +12,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="JOSEMI OS — un sistema operativo ficticio (tema Windows 95) para explorar mi portfolio.">
 <title>JOSEMI_OS</title>
-<link rel="icon" type="img/png" href="img/pc.png">
+
+<!-- [CANVI] El tipus correcte és image/png (abans tenies img/png, que el navegador ignora). -->
+<link rel="icon" type="image/png" href="img/pc.png">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -21,12 +24,17 @@
 <body>
   <!-- Capas decorativas globales. aria-hidden evita que un lector de pantalla las anuncie. -->
   <div id="bg" aria-hidden="true"></div>
+  <!-- [INTEGRACIÓ MATRIX] El fons Matrix (pluja de caràcters) NO va ací:
+       el JS crearà un <canvas id="matrix-wall"> al costat d'este #bg.
+       Per això el #bg ha de quedar buit i amb z-index baix. -->
   <div id="cursor" aria-hidden="true"></div>
 
   <!-- LOGIN: es la primera capa visible. Las demás empiezan con la clase hidden. -->
   <div id="login" class="login">
     <div class="login__card">
       <!-- pre conserva exactamente espacios y saltos de línea, algo imprescindible para ASCII art. -->
+      <!-- [ASCII INTEGRAT] Este és el teu ASCII gran de l'ordinador amb calavera.
+           No el toque: és el que es veu en entrar. El JS NO el regenera. -->
       <pre class="login__computer" role="img" aria-label="Ordenador ASCII con una calavera">     _______________________________________________
     /______________________________________________/|
     |  ___________________________________________  |
@@ -74,12 +82,14 @@
     /_______[____________________]____________/ /
     |_________________________________________|/</pre>
       <!-- El texto visual es ASCII; aria-label ofrece una versión clara para accesibilidad. -->
+      <!-- [ASCII INTEGRAT] Este és el "JOSEMI_OS" de lletres grans. També teu. No el toque. -->
       <h2 class="login__user" aria-label="JOSEMI_OS"><span class="login__ascii" aria-hidden="true">     _  ___  ____  _____ __  __ ___       ___  ____
     | |/ _ \/ ___|| ____|  \/  |_ _|     / _ \/ ___|
  _  | | | | \___ \|  _| | |\/| || |     | | | \___ \
 | |_| | |_| |___) | |___| |  | || |_____| |_| |___) |
  \___/ \___/|____/|_____|_|  |_|___||___|\___/|____/</span></h2>
       <!-- JavaScript actualiza esta línea y la barra durante la secuencia de entrada. -->
+      <!-- [INTEGRACIÓ LOGIN] El JS escriurà ací "> AUTHENTICATING..." i omplirà la barra. -->
       <div class="login__sequence" id="loginSequence" aria-live="polite">
         <span id="loginSequenceText">&gt; WAITING FOR SIGNAL_</span>
         <span id="loginSequenceBar">[........................] 0%</span>
@@ -119,11 +129,14 @@
   <!-- ESCRITORIO: la mayoría del contenido se crea dinámicamente desde script.js. -->
   <main id="desktop" class="desktop hidden">
     <!-- Contenedores vacíos que JavaScript rellena usando los datos de Apps e ICONS. -->
+    <!-- [INTEGRACIÓ JOCOS] Ací el JS pinta els iconos (inclòs 🎮 Tetris i 🟡 Pac-Man).
+         El JS buscarà EXACTAMENT este id="icons". -->
     <div class="icons" id="icons"></div>
 
     <div id="menu" class="menu hidden">
       <div class="menu__head"><span class="menu__avatar">J</span><div><strong>Josemi</strong><small>DAM Student</small></div></div>
       <div class="menu__label">Applications</div>
+      <!-- [INTEGRACIÓ JOCOS] Ací el JS pinta els botons del menú (totes les apps + jocs). -->
       <div class="menu__apps" id="menu__apps"></div>
       <div class="menu__power"><button data-power="restart">↻ Restart</button><button data-power="shutdown">⏻ Shutdown</button></div>
     </div>
@@ -134,11 +147,15 @@
       <button data-act="wallpaper">🖼 Cambiar Fondo de Pantalla</button>
       <button data-act="terminal">💻 Abrir Terminal</button>
       <button data-act="system">🖥 Información del sistema</button>
+      <!-- [NOU OPCIONAL] Entrada per a obrir els jocs ràpid des del clic dret.
+           Si no la vols, esborra esta línia; el JS la ignora si no existeix. -->
+      <button data-act="arcade">🕹 Arcade (Jocs)</button>
     </div>
 
     <!-- Barra de tareas fija: inicio, ventanas abiertas y reloj. -->
     <footer class="taskbar">
       <button id="start" class="taskbar__start"><span class="taskbar__logo">◈</span> JOSEMI</button>
+      <!-- [INTEGRACIÓ FINESTRES] Ací el JS pinta un botó per cada finestra oberta. -->
       <div class="taskbar__apps" id="taskbar__apps"></div>
       <div class="taskbar__tray">
         <span class="tray__item">📶</span><span class="tray__item">🔊</span><span class="tray__item">🔋 100%</span>
@@ -146,6 +163,11 @@
       </div>
     </footer>
   </main>
+
+  <!-- [NOU] Contenidor on el gestor de finestres (WM) pinta les finestres dels jocs/apps.
+       És un div buit: el JS l'omple. Si el teu JS ja pinta finestres dins d'un altre lloc,
+       pots esborrar-lo, però és el lloc estàndard i no afecta al teu CSS. -->
+  <div id="windows" aria-live="polite"></div>
 
   <!-- SHUTDOWN: capa superior que simula apagar y reiniciar el sistema. -->
   <div id="shutdown" class="shutdown hidden">

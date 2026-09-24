@@ -441,3 +441,17 @@ body{font-family:var(--font-ui)}
 }
 .login.ascii-glitch .login__computer{transform:translateX(1px);filter:contrast(1.35)}
 @media(max-height:700px){.login{justify-content:flex-start}.login .login__brand{position:static}}
+/* [NOU] Fons Matrix dins del #bg (el JS crea este canvas) */
+#matrix-wall{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.85}
+@media (prefers-reduced-motion: reduce){#matrix-wall{display:none}}
+
+/* [NOU] Casella especial "M" a Settings */
+.wp--matrix{color:#00ff41;font-family:var(--font-mono);font-weight:700;background:#000!important;border:1px solid #00ff41!important;box-shadow:0 0 12px rgba(0,255,65,.25);display:flex;align-items:center;justify-content:center}
+
+/* [NOU] Contenedors dels jocs retro */
+.game{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;min-height:100%;background:#000;color:#fff;font-family:var(--font-mono);user-select:none}
+.game canvas{background:#000;border:2px solid rgba(255,255,255,.16);box-shadow:0 0 24px rgba(0,255,65,.12);image-rendering:pixelated}
+.game__hud{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:1rem;font-size:.85rem;letter-spacing:.08em}
+.game__hud b{color:#00ff41;font-size:1rem}
+.game--tetris canvas{border-color:rgba(0,200,255,.35);box-shadow:0 0 24px rgba(0,200,255,.14)}
+.game--pacman canvas{border-color:rgba(245,185,66,.35);box-shadow:0 0 24px rgba(245,185,66,.14)}
