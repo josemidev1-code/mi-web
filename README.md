@@ -6,7 +6,7 @@ JOSEMI-OS es mi portfolio convertido en un pequeño sistema operativo interactiv
 
 ## ¿Quién soy?
 
-Soy **José Miguel Miralles Gandia**, estudiante de **DAM (Desarrollo de Aplicaciones Multiplataforma) en SSIMARRO** y desarrollador de software en proceso.
+Soy **José Miguel Miralles Gandia**, estudiante de **DAM (Desarrollo de Aplicaciones Multiplataforma) en el IES DR. Lluís Simarro y desarrollador de software en proceso.
 
 Ahora mismo estoy trabajando especialmente con **HTML, CSS y JavaScript**, porque este portfolio es uno de los proyectos con los que estoy aprendiendo y mejorando. Me interesa mucho la informática, la inteligencia artificial y el potencial de combinar software, automatización y creatividad.
 
