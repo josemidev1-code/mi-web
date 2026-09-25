@@ -70,7 +70,7 @@ function loopMatrix(){
     matrixCtx.fillStyle='#00ff41';                                // cos verd (un per damunt)
     matrixCtx.fillText(matrixChars[Math.floor(Math.random()*matrixChars.length)],i*18,(y-1)*18);
     if(y*18>matrixCanvas.height&&Math.random()>.975)matrixDrops[i]=0;
-    matrixDrops[i]+=2;   // VELOCITAT: puja a 3 o 4 si el vols encara més ràpid
+    matrixDrops[i]+=1;   // Velocidad más calmada para que el fondo no distraiga
   });
   matrixAnim=requestAnimationFrame(loopMatrix);
 }
@@ -127,75 +127,101 @@ function toast(m){const t=document.createElement('div');t.className='toast';t.te
    existe, conecta eventos después de insertar ese HTML en una ventana.
    Añadir una app nueva aquí y su id en ICONS basta para mostrarla en el sistema.
    ========================================================= */
+const PROFILE={
+  nombre:'Josemi',
+  rol:'Estudiante de Desarrollo de Aplicaciones Multiplataforma',
+  estado:'Aprendiendo, construyendo y mejorando cada proyecto',
+  ubicacion:'España',
+  bio:'Estudiante de Desarrollo de Aplicaciones Multiplataforma interesado en programación, desarrollo web, aplicaciones y tecnología. Me gusta aprender creando proyectos y experimentar con nuevas tecnologías.',
+  aspiracion:'PENDIENTE_DE_PERSONALIZAR',
+  gustos:['Programación','Desarrollo web','Aplicaciones','Tecnología']
+};
+
+const pixelIcon=tipo=>`<span class="app-pixel-icon app-pixel-icon--${tipo}" aria-hidden="true"></span>`;
+
 const Apps={
- about:{title:'About Me',icon:'👤',render:()=>`
-   <div class="app-title">USER PROFILE</div>
-   <dl class="kv"><dt>Name</dt><dd>Josemi</dd><dt>Role</dt><dd>DAM Student</dd><dt>Status</dt><dd>Learning &amp; Building</dd><dt>Location</dt><dd>Spain</dd></dl>
-   <div class="divider"></div><p class="bio">Estudiante de Desarrollo de Aplicaciones Multiplataforma interesado en programación, desarrollo web, aplicaciones y tecnología. Me gusta aprender creando proyectos y experimentar con nuevas tecnologías.</p>
-   <div class="divider"></div><div class="app-title">SYSTEM INFO</div>
-   <dl class="kv"><dt>Curiosity</dt><dd>100%</dd><dt>Coffee dependency</dt><dd>75%</dd><dt>Bugs created</dt><dd>classified</dd><dt>Bugs fixed</dt><dd>hopefully more</dd></dl>`},
+ about:{title:'Sobre mí',icon:'👤',render:()=>`
+   <div class="app-title">PERFIL DE USUARIO</div>
+   <dl class="kv"><dt>Nombre</dt><dd>${PROFILE.nombre}</dd><dt>Rol</dt><dd>${PROFILE.rol}</dd><dt>Estado</dt><dd>${PROFILE.estado}</dd><dt>Ubicación</dt><dd>${PROFILE.ubicacion}</dd></dl>
+   <div class="divider"></div><p class="bio">${PROFILE.bio}</p>
+   <div class="divider"></div><div class="app-title">LO QUE ME MUEVE</div>
+   <div class="chips">${PROFILE.gustos.map(x=>`<span class="chip g-comf">${x}</span>`).join('')}</div>
+   <div class="divider"></div><div class="app-title">HACIA DÓNDE VOY</div>
+   <p class="bio profile-pending">${PROFILE.aspiracion==='PENDIENTE_DE_PERSONALIZAR'
+     ?'⚠ Pendiente de personalizar contigo: objetivo profesional, tipo de proyectos que quieres crear y qué vida aspiras a construir.'
+     :PROFILE.aspiracion}</p>
+   <div class="divider"></div><div class="app-title">DATOS DEL SISTEMA</div>
+   <dl class="kv"><dt>Curiosidad</dt><dd>100%</dd><dt>Modo actual</dt><dd>Aprendizaje continuo</dd><dt>Bugs</dt><dd>Se arreglan uno a uno</dd><dt>Versión</dt><dd>JOSEMI_OS 2.0</dd></dl>`},
 
- projects:{title:'Projects',icon:'📁',render:()=>`
-   <div class="app-title">Projects/</div>
+ projects:{title:'Proyectos',icon:'📁',render:()=>`
+   <div class="app-title">PROYECTOS/</div>
+   <p class="bio">Doble clic para abrir una carpeta. Los datos actuales son los que ya había en tu portfolio y conviene sustituirlos por tus proyectos reales.</p>
    <div class="folder-grid">
-     <div class="folder" data-folder="java"><span class="g">📁</span><span class="n">Java</span></div>
-     <div class="folder" data-folder="web"><span class="g">📁</span><span class="n">Web</span></div>
-     <div class="folder" data-folder="exp"><span class="g">📁</span><span class="n">Experiments</span></div>
-     <div class="folder" data-folder="school"><span class="g">📁</span><span class="n">School Projects</span></div>
+     <div class="folder" tabindex="0" data-folder="java"><span class="g">📁</span><span class="n">Java</span></div>
+     <div class="folder" tabindex="0" data-folder="web"><span class="g">📁</span><span class="n">Web</span></div>
+     <div class="folder" tabindex="0" data-folder="exp"><span class="g">📁</span><span class="n">Experimentos</span></div>
+     <div class="folder" tabindex="0" data-folder="school"><span class="g">📁</span><span class="n">Proyectos de clase</span></div>
    </div>`,
-   bind(b){b.querySelectorAll('.folder').forEach(f=>f.addEventListener('dblclick',()=>openProject(f.dataset.folder)));}},
+   bind(b){b.querySelectorAll('.folder').forEach(f=>{
+     const abrir=()=>openProject(f.dataset.folder);
+     f.addEventListener('dblclick',abrir);
+     f.addEventListener('keydown',e=>{if(e.key==='Enter')abrir();});
+   });}},
 
- skills:{title:'Skills',icon:'⚡',render:()=>`
-   <div class="app-title">SYSTEM RESOURCES</div>${bar('Java',80)}${bar('SQL',70)}${bar('HTML',80)}${bar('CSS',70)}${bar('JavaScript',60)}${bar('Git',60)}
-   <div class="cat-label">COMFORTABLE</div><div class="chips"><span class="chip g-comf">Java</span><span class="chip g-comf">HTML</span><span class="chip g-comf">CSS</span><span class="chip g-comf">SQL</span></div>
-   <div class="cat-label">LEARNING</div><div class="chips"><span class="chip g-learn">JavaScript</span><span class="chip g-learn">Git</span><span class="chip g-learn">Docker</span></div>
-   <div class="cat-label">NEXT</div><div class="chips"><span class="chip g-next">Spring</span><span class="chip g-next">React</span><span class="chip g-next">Backend development</span></div>`,
+ skills:{title:'Habilidades',icon:'⚡',render:()=>`
+   <div class="app-title">RECURSOS DEL SISTEMA</div>${bar('Java',80)}${bar('SQL',70)}${bar('HTML',80)}${bar('CSS',70)}${bar('JavaScript',60)}${bar('Git',60)}
+   <div class="cat-label">ME DEFIENDO</div><div class="chips"><span class="chip g-comf">Java</span><span class="chip g-comf">HTML</span><span class="chip g-comf">CSS</span><span class="chip g-comf">SQL</span></div>
+   <div class="cat-label">APRENDIENDO</div><div class="chips"><span class="chip g-learn">JavaScript</span><span class="chip g-learn">Git</span><span class="chip g-learn">Docker</span></div>
+   <div class="cat-label">SIGUIENTE NIVEL</div><div class="chips"><span class="chip g-next">Spring</span><span class="chip g-next">React</span><span class="chip g-next">Backend</span></div>
+   <p class="profile-note">Estos porcentajes ya estaban en el código. Dime cuáles representan de verdad tu nivel y los ajusto.</p>`,
    bind(b){b.querySelectorAll('.bar>i').forEach(el=>requestAnimationFrame(()=>el.style.width=el.dataset.w+'%'));}},
 
  terminal:{title:'Terminal',icon:'💻',render:()=>`
    <div class="term"><div class="term__out" id="term-out"></div>
    <div class="term__line"><span class="p">josemi@portfolio</span>:<span class="dir">~</span>$<input class="term__in" id="term-in" autocomplete="off" spellcheck="false"></div></div>`,
    bind(b){const out=$('#term-out',b),inp=$('#term-in',b);
-     // Esta función imprime una nueva línea dentro de la terminal simulada.
      const print=(h,c='')=>{const d=document.createElement('div');d.className=c;d.innerHTML=h;out.appendChild(d);out.scrollTop=out.scrollHeight;};
-     print('JOSEMI OS Terminal · type <span class="ok">help</span>');
+     print('Terminal de JOSEMI OS · escribe <span class="ok">ayuda</span>');
      inp.addEventListener('keydown',e=>{if(e.key!=='Enter')return;const raw=inp.value.trim();inp.value='';
        print(`<span class="p">josemi@portfolio</span>:<span class="dir">~</span>$ ${raw}`);runCommand(raw,print,openWindow);});
      b.addEventListener('click',()=>inp.focus());}},
 
- readme:{title:'README.txt',icon:'📄',render:()=>`<div class="editor"><span class="h"># JOSEMI OS</span>\n\nWelcome.\nThis operating system contains information about Josemi,\na student of Desarrollo de Aplicaciones Multiplataforma.\n\nFeel free to explore the system.\n\nUseful commands:\n  Terminal → help\n\n<span class="w">Warning:</span>\nSome files may contain bugs.</div>`},
+ readme:{title:'LEEME.txt',icon:'📄',render:()=>`<div class="editor"><span class="h"># JOSEMI OS</span>\n\nBienvenido a mi portfolio convertido en sistema operativo.\nAquí puedes conocerme, explorar mis proyectos, ver lo que estoy aprendiendo,\nabrir una terminal e incluso perder unos minutos en el Arcade.\n\nTodo está hecho para tocarlo, abrirlo y descubrirlo.\n\nComandos útiles:\n  Terminal → ayuda\n  Terminal → secreto\n\n<span class="w">Aviso:</span>\nHay easter eggs escondidos por el sistema.</div>`},
 
- contact:{title:'Contact',icon:'📬',render:()=>`
-   <div class="contact"><h2>LET'S BUILD SOMETHING.</h2><div class="links">
+ contact:{title:'Contacto',icon:'📬',render:()=>`
+   <div class="contact"><h2>CONSTRUYAMOS ALGO.</h2><div class="links">
      <a class="clink" href="https://github.com/josemidev1-code" target="_blank" rel="noopener"><span class="g">🐙</span> GitHub</a>
-     <a class="clink" href="https://www.linkedin.com/in/TU_USUARIO" target="_blank" rel="noopener"><span class="g">💼</span> LinkedIn</a>
+     <button class="clink clink--button" id="linkedin-pending"><span class="g">💼</span> LinkedIn · pendiente de personalizar</button>
      <a class="clink" href="mailto:josemidev1@gmail.com"><span class="g">✉️</span> josemidev1@gmail.com</a>
-   </div><button class="btn btn--accent" id="copy-email">COPY EMAIL</button></div>`,
-   bind(b){$('#copy-email',b).addEventListener('click',async()=>{try{await navigator.clipboard.writeText('josemidev1@gmail.com');toast('Copied to clipboard.');}catch{toast('No clipboard access.');}});}},
+   </div><button class="btn btn--accent" id="copy-email">COPIAR CORREO</button></div>`,
+   bind(b){
+     $('#linkedin-pending',b).addEventListener('click',()=>toast('Falta tu URL real de LinkedIn.'));
+     $('#copy-email',b).addEventListener('click',async()=>{try{await navigator.clipboard.writeText('josemidev1@gmail.com');toast('Correo copiado al portapapeles.');}catch{toast('No se ha podido acceder al portapapeles.');}});
+   }},
 
- trash:{title:'Trash',icon:'🗑',render:()=>`
-   <div class="app-title">/home/josemi/.trash</div>
-   <div class="file-row" data-file="motivation.exe"><span class="g">⚙️</span> motivation.exe</div>
+ trash:{title:'Papelera',icon:'🗑',render:()=>`
+   <div class="app-title">/home/josemi/.papelera</div>
+   <div class="file-row" data-file="motivation.exe"><span class="g">⚙️</span> motivacion.exe</div>
    <div class="file-row" data-file="x"><span class="g">📄</span> matrix-design.old</div>
-   <div class="file-row" data-file="x"><span class="g">🗜️</span> failed-project.zip</div>
-   <div class="file-row" data-file="x"><span class="g">📄</span> todo-list-final-final-v2.java</div>`,
+   <div class="file-row" data-file="x"><span class="g">🗜️</span> proyecto-fallido.zip</div>
+   <div class="file-row" data-file="x"><span class="g">📄</span> todo-final-final-ahora-si.java</div>`,
    bind(b){b.querySelectorAll('.file-row').forEach(r=>r.addEventListener('dblclick',()=>{
-     if(r.dataset.file==='motivation.exe')openWindow('motivation');else toast('File is corrupted. (just kidding 🙂)');}));}},
+     if(r.dataset.file==='motivation.exe')openWindow('motivation');else toast('Archivo corrupto. Es broma 🙂');}));}},
 
- settings:{title:'Settings',icon:'⚙',render:()=>`
-   <div class="app-title">SETTINGS</div>
-   <div class="setting"><div>Reduce animations<small>Desactiva transiciones</small></div><button class="switch ${state.motion?'on':''}" id="sw-motion"></button></div>
-   <div class="setting"><div>Sounds<small>Beeps al abrir/cerrar</small></div><button class="switch ${state.sound?'on':''}" id="sw-sound"></button></div>
-   <div class="setting"><div>Accent color<small>Sin efecto bajo Win95</small></div><div class="swatches" id="sw-accent">
+ settings:{title:'Configuración',icon:'⚙️',render:()=>`
+   <div class="app-title">CONFIGURACIÓN</div>
+   <div class="setting"><div>Reducir animaciones<small>Desactiva transiciones y efectos</small></div><button class="switch ${state.motion?'on':''}" id="sw-motion"></button></div>
+   <div class="setting"><div>Sonidos<small>Beeps al abrir y cerrar</small></div><button class="switch ${state.sound?'on':''}" id="sw-sound"></button></div>
+   <div class="setting"><div>Color de acento<small>Afecta a distintos elementos del sistema</small></div><div class="swatches" id="sw-accent">
      <span class="swatch ${state.accent==='#6C63FF'?'on':''}" data-c="#6C63FF" style="background:#6C63FF"></span>
      <span class="swatch ${state.accent==='#00C8FF'?'on':''}" data-c="#00C8FF" style="background:#00C8FF"></span>
      <span class="swatch ${state.accent==='#4ade80'?'on':''}" data-c="#4ade80" style="background:#4ade80"></span>
      <span class="swatch ${state.accent==='#f5b942'?'on':''}" data-c="#f5b942" style="background:#f5b942"></span></div></div>
-   <div class="setting"><div>Darkness<small>Nivel de fondo</small></div><select id="sel-dark">
-     <option value="#050505" ${state.bg==='#050505'?'selected':''}>Dark</option>
-     <option value="#030303" ${state.bg==='#030303'?'selected':''}>Darker</option>
-     <option value="#000000" ${state.bg==='#000000'?'selected':''}>Very Dark</option></select></div>
-   <div class="setting"><div>Wallpaper<small>Fondo del escritorio</small></div><div class="wp-row" id="sw-wp">
+   <div class="setting"><div>Oscuridad<small>Nivel del fondo</small></div><select id="sel-dark">
+     <option value="#050505" ${state.bg==='#050505'?'selected':''}>Oscuro</option>
+     <option value="#030303" ${state.bg==='#030303'?'selected':''}>Más oscuro</option>
+     <option value="#000000" ${state.bg==='#000000'?'selected':''}>Negro total</option></select></div>
+   <div class="setting"><div>Fondo de pantalla<small>Cambia el escritorio</small></div><div class="wp-row" id="sw-wp">
      ${WALLS.map((w,i)=>w==='matrix'
        ?`<span class="wp wp--matrix ${i===state.wp?'on':''}" data-w="${i}">M</span>`
        :`<span class="wp ${i===state.wp?'on':''}" data-w="${i}" style="background:${w}"></span>`).join('')}</div></div>`,
@@ -206,122 +232,184 @@ const Apps={
      $('#sel-dark',b).onchange=e=>{state.bg=e.target.value;applyTheme();save();};
      $$('#sw-wp .wp',b).forEach(w=>w.onclick=()=>{state.wp=+w.dataset.w;$$('#sw-wp .wp',b).forEach(x=>x.classList.remove('on'));w.classList.add('on');applyTheme();save();});}},
 
- system:{title:'System Monitor',icon:'🖥',render:()=>`
-   <div class="app-title">JOSEMI OS · System Status: <span style="color:#4ade80">ONLINE</span></div>
+ system:{title:'Monitor del sistema',icon:'🖥️',render:()=>`
+   <div class="app-title">JOSEMI OS · ESTADO: <span style="color:#168b16">EN LÍNEA</span></div>
    <div class="sys-grid">
-     <div class="sys-card"><b id="sys-uptime">0s</b><span>Session uptime</span></div>
-     <div class="sys-card"><b id="sys-time">--:--</b><span>Current time</span></div>
-     <div class="sys-card"><b id="sys-res">—</b><span>Resolution</span></div>
-     <div class="sys-card"><b id="sys-lang">—</b><span>Browser language</span></div>
-     <div class="sys-card"><b id="sys-browser">—</b><span>Browser</span></div></div>`,
+     <div class="sys-card"><b id="sys-uptime">0s</b><span>Tiempo de sesión</span></div>
+     <div class="sys-card"><b id="sys-time">--:--</b><span>Hora actual</span></div>
+     <div class="sys-card"><b id="sys-res">—</b><span>Resolución</span></div>
+     <div class="sys-card"><b id="sys-lang">—</b><span>Idioma del navegador</span></div>
+     <div class="sys-card"><b id="sys-browser">—</b><span>Navegador</span></div></div>`,
    bind(b){$('#sys-res',b).textContent=`${screen.width}×${screen.height}`;$('#sys-lang',b).textContent=navigator.language;
-     const ua=navigator.userAgent;$('#sys-browser',b).textContent=/Firefox/.test(ua)?'Firefox':/Edg/.test(ua)?'Edge':/Chrome/.test(ua)?'Chrome':/Safari/.test(ua)?'Safari':'Unknown';}},
+     const ua=navigator.userAgent;$('#sys-browser',b).textContent=/Firefox/.test(ua)?'Firefox':/Edg/.test(ua)?'Edge':/Chrome/.test(ua)?'Chrome':/Safari/.test(ua)?'Safari':'Desconocido';}},
 
- motivation:{title:'motivation.exe',icon:'💡',render:()=>`<div style="text-align:center;padding:2rem 1rem"><div style="font-size:2.5rem">💡</div><p style="font-family:var(--font-mono);margin-top:1rem;line-height:1.8">Keep building.<br>You are closer than you think.</p></div>`},
+ motivation:{title:'motivacion.exe',icon:'💡',render:()=>`<div style="text-align:center;padding:2rem 1rem"><div style="font-size:2.5rem">💡</div><p style="font-family:var(--font-mono);margin-top:1rem;line-height:1.8">Sigue construyendo.<br>Cada proyecto te acerca a lo que quieres ser.</p></div>`},
 
-/* =========================================================
-   [NOU] 🎮 TETRIS  (canvas, sense IDs duplicats => usa classes)
-   ========================================================= */
- tetris:{title:'Tetris',icon:'🎮',render:()=>`
-   <div class="game game--tetris">
-     <canvas class="tetris-canvas" width="240" height="480"></canvas>
-     <div class="game__hud">
-       <span>SCORE <b class="tetris-score">0</b></span>
-       <span>LEVEL <b class="tetris-level">1</b></span>
-       <button class="btn tetris-start">START</button>
-     </div>
+ arcade:{title:'Arcade',icon:'🕹️',render:()=>`
+   <div class="app-title">C:\\JOSEMI_OS\\JUEGOS</div>
+   <p class="bio">Una pequeña carpeta de juegos retro. Abre uno y usa el teclado.</p>
+   <div class="arcade-grid">
+     <button class="game-shortcut" data-game="tetris">${pixelIcon('tetris')}<strong>Tetris</strong><small>Bloques · 10×20</small></button>
+     <button class="game-shortcut" data-game="pacman">${pixelIcon('pacman')}<strong>Pac-Man</strong><small>Laberinto · fantasmas</small></button>
    </div>`,
-   bind(b,win){
-     win=win||b.closest('.window');                 // el WM ens passa la finestra
-     const cv=$('.tetris-canvas',b),ctx=cv.getContext('2d');
-     const scoreEl=$('.tetris-score',b),levelEl=$('.tetris-level',b),startBtn=$('.tetris-start',b);
-     const COLS=12,ROWS=24,S=20;                    // tauler i mida de cel·la
-     const COLORS=['#00C8FF','#6C63FF','#f5b942','#4ade80','#ef4444','#a3e635','#c084fc'];
-     const SHAPES=[[[1,1,1,1]],[[1,1],[1,1]],[[0,1,0],[1,1,1]],[[1,0,0],[1,1,1]],[[0,0,1],[1,1,1]],[[1,1,0],[0,1,1]],[[0,1,1],[1,1,0]]];
-     let board,piece,score=0,level=1,speed=500,timer=null,running=false;
+   bind(b){b.querySelectorAll('[data-game]').forEach(x=>x.addEventListener('click',()=>openWindow(x.dataset.game)));}},
 
-     function reset(){board=Array.from({length:ROWS},()=>Array(COLS).fill(0));score=0;level=1;speed=500;scoreEl.textContent=score;levelEl.textContent=level;}
-     function newPiece(){const i=Math.floor(Math.random()*SHAPES.length);return{x:Math.floor((COLS-SHAPES[i][0].length)/2),y:0,shape:SHAPES[i],color:i+1};}
-     // collide: xoca la peça si es mou (dx,dy) o si la forma `shape` ix del tauler o toca un bloc fix.
-     function collide(p,dx=0,dy=0,shape=p.shape){for(let y=0;y<shape.length;y++)for(let x=0;x<shape[y].length;x++){if(!shape[y][x])continue;const nx=p.x+x+dx,ny=p.y+y+dy;if(nx<0||nx>=COLS||ny>=ROWS)return true;if(ny>=0&&board[ny][nx])return true;}return false;}
-     function rotate(){const r=piece.shape[0].map((_,i)=>piece.shape.map(row=>row[i]).reverse());if(!collide(piece,0,0,r))piece.shape=r;}
-     function drawCell(x,y,c){ctx.fillStyle=c;ctx.fillRect(x*S,y*S,S,S);ctx.strokeStyle='rgba(0,0,0,.45)';ctx.strokeRect(x*S,y*S,S,S);}
-     function draw(){ctx.fillStyle='#000';ctx.fillRect(0,0,cv.width,cv.height);ctx.strokeStyle='rgba(255,255,255,.04)';
-       for(let x=0;x<=COLS;x++){ctx.beginPath();ctx.moveTo(x*S,0);ctx.lineTo(x*S,cv.height);ctx.stroke();}
-       for(let y=0;y<=ROWS;y++){ctx.beginPath();ctx.moveTo(0,y*S);ctx.lineTo(cv.width,y*S);ctx.stroke();}
-       board.forEach((row,y)=>row.forEach((v,x)=>{if(v)drawCell(x,y,COLORS[(v-1)%COLORS.length]);}));
-       if(piece)piece.shape.forEach((row,y)=>row.forEach((v,x)=>{if(v)drawCell(piece.x+x,piece.y+y,COLORS[(piece.color-1)%COLORS.length]);}));}
-     // lock: fixar la peça, netejar línies plenes, puntuar i pujar nivell/velocitat.
-     function lock(){piece.shape.forEach((row,y)=>row.forEach((v,x)=>{if(v&&piece.y+y>=0)board[piece.y+y][piece.x+x]=piece.color;}));
-       let cleared=0;for(let y=ROWS-1;y>=0;y--){if(board[y].every(v=>v)){board.splice(y,1);board.unshift(Array(COLS).fill(0));cleared++;y++;}}
-       score+=[0,100,300,500,800][cleared]||0;level=Math.floor(score/1000)+1;speed=Math.max(90,500-(level-1)*40);
-       scoreEl.textContent=score;levelEl.textContent=level;if(timer){clearInterval(timer);timer=setInterval(tick,speed);}
-       piece=newPiece();if(collide(piece,0,0)){stop();toast('Game Over');}}
-     function tick(){if(!piece)return;if(!collide(piece,0,1))piece.y++;else lock();draw();}
-     function start(){stop();reset();piece=newPiece();running=true;timer=setInterval(tick,speed);draw();win.focus();}
-     function stop(){if(timer)clearInterval(timer);timer=null;running=false;}
-     // Teclat: ← → moure, ↓ baixar, ↑ girar, ESPAI caiguda instantània.
-     function key(e){if(!running)return;if(['ArrowLeft','ArrowRight','ArrowDown','ArrowUp',' '].includes(e.key))e.preventDefault();
-       if(e.key==='ArrowLeft'&&!collide(piece,-1,0))piece.x--;
-       if(e.key==='ArrowRight'&&!collide(piece,1,0))piece.x++;
-       if(e.key==='ArrowDown'&&!collide(piece,0,1)){piece.y++;score++;scoreEl.textContent=score;}
-       if(e.key==='ArrowUp')rotate();
-       if(e.key===' '){while(!collide(piece,0,1))piece.y++;lock();}draw();}
-     win.tabIndex=0;win.addEventListener('keydown',key);cv.addEventListener('click',()=>win.focus());
-     // [FIX] Cleanup: el WM cridarà win.__cleanup() en tancar la finestra.
-     win.__cleanup=()=>{stop();win.removeEventListener('keydown',key);};
-     startBtn.addEventListener('click',start);reset();draw();
-   }},
-
-/* =========================================================
-   [NOU] 🟡 PAC-MAN mini  (fantasma que PERSEGUISCA el jugador)
-   ========================================================= */
- pacman:{title:'Pac-Man',icon:'🟡',render:()=>`
-   <div class="game game--pacman">
-     <canvas class="pac-canvas" width="280" height="280"></canvas>
-     <div class="game__hud">
-       <span>SCORE <b class="pac-score">0</b></span>
-       <button class="btn pac-start">START</button>
+ tetris:{title:'Tetris',icon:pixelIcon('tetris'),render:()=>`
+   <div class="game game--tetris">
+     <div class="tetris-layout">
+       <canvas class="tetris-canvas" width="200" height="400" aria-label="Tablero de Tetris"></canvas>
+       <div class="game-side">
+         <div class="game-panel"><span>SIGUIENTE</span><canvas class="tetris-next" width="96" height="96"></canvas></div>
+         <div class="game-panel"><span>PUNTOS</span><b class="tetris-score">0</b></div>
+         <div class="game-panel"><span>LÍNEAS</span><b class="tetris-lines">0</b></div>
+         <div class="game-panel"><span>NIVEL</span><b class="tetris-level">1</b></div>
+         <button class="btn tetris-start">NUEVA PARTIDA</button>
+         <button class="btn tetris-pause" disabled>PAUSA</button>
+       </div>
      </div>
+     <div class="game-help">← → mover · ↓ bajar · ↑/X girar · Z giro inverso · ESPACIO caída · P pausa</div>
    </div>`,
    bind(b,win){
      win=win||b.closest('.window');
-     const cv=$('.pac-canvas',b),ctx=cv.getContext('2d'),scoreEl=$('.pac-score',b),startBtn=$('.pac-start',b);
-     const CELL=20,COLS=14,ROWS=14;                 // # = paret, . = punt
-     const maze=['##############','#............#','#.##.####.##.#','#.#........#.#','#.##.####.##.#','#............#','####.####.####','#..#....#..#.#','#.##.##.##.#.#','#............#','##.##.##.##.##','#............#','#.##.####.##.#','##############'];
-     let dots=[],player={x:1,y:1},ghost={x:12,y:12},score=0,timer=null,running=false,lastGhost={dx:0,dy:0};
-     function canMove(x,y){return x>=0&&x<COLS&&y>=0&&y<ROWS&&maze[y][x]!=='#';}
-     function reset(){dots=[];for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++)if(maze[y][x]==='.')dots.push({x,y});player={x:1,y:1};ghost={x:12,y:12};score=0;scoreEl.textContent=score;lastGhost={dx:0,dy:0};}
-     function draw(){ctx.fillStyle='#000';ctx.fillRect(0,0,cv.width,cv.height);ctx.fillStyle='#0033cc';
-       for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++)if(maze[y][x]==='#')ctx.fillRect(x*CELL,y*CELL,CELL,CELL);
-       ctx.fillStyle='#fff';dots.forEach(d=>ctx.fillRect(d.x*CELL+8,d.y*CELL+8,4,4));
-       ctx.fillStyle='#f5b942';ctx.beginPath();ctx.arc(player.x*CELL+CELL/2,player.y*CELL+CELL/2,8,0,Math.PI*2);ctx.fill();
-       ctx.fillStyle='#ff3b3b';ctx.beginPath();ctx.arc(ghost.x*CELL+CELL/2,ghost.y*CELL+CELL/2,8,0,Math.PI*2);ctx.fill();}
-     function eat(){const i=dots.findIndex(d=>d.x===player.x&&d.y===player.y);if(i>=0){dots.splice(i,1);score+=10;scoreEl.textContent=score;}if(!dots.length){stop();toast('Level clear!');}}
-     function hit(){if(player.x===ghost.x&&player.y===ghost.y){stop();toast('Caught!');}}
-     function move(dx,dy){if(!running)return;const nx=player.x+dx,ny=player.y+dy;if(!canMove(nx,ny))return;player.x=nx;player.y=ny;eat();hit();draw();}
-     // [FIX] ghostMove: el fantasma tria la casella LLIURE que el ACOSTA al Pac-Man (greedy),
-     // sense fer mitja volta constant i amb un 25% d'atzar per a no ser infal·lible.
-     function ghostMove(){
-       if(!running)return;
-       const all=[[1,0],[-1,0],[0,1],[0,-1]];
-       const noBack=all.filter(([dx,dy])=>!(dx===-lastGhost.dx&&dy===-lastGhost.dy));
-       const valid=noBack.filter(([dx,dy])=>canMove(ghost.x+dx,ghost.y+dy));
-       const pool=valid.length?valid:all.filter(([dx,dy])=>canMove(ghost.x+dx,ghost.y+dy));
-       if(!pool.length)return;
-       let best=pool[0],bestDist=Infinity;
-       pool.forEach(([dx,dy])=>{const d=Math.abs((ghost.x+dx)-player.x)+Math.abs((ghost.y+dy)-player.y);if(d<bestDist){bestDist=d;best=[dx,dy];}});
-       if(Math.random()<0.25)best=pool[Math.floor(Math.random()*pool.length)];
-       ghost.x+=best[0];ghost.y+=best[1];lastGhost={dx:best[0],dy:best[1]};
-       hit();draw();
+     const cv=$('.tetris-canvas',b),ctx=cv.getContext('2d'),nextCv=$('.tetris-next',b),nextCtx=nextCv.getContext('2d');
+     const scoreEl=$('.tetris-score',b),linesEl=$('.tetris-lines',b),levelEl=$('.tetris-level',b);
+     const startBtn=$('.tetris-start',b),pauseBtn=$('.tetris-pause',b);
+     const COLS=10,ROWS=20,S=20;
+     const PIECES={
+       I:{c:'#00d7ff',s:[[1,1,1,1]]},O:{c:'#ffd21f',s:[[1,1],[1,1]]},T:{c:'#b84cff',s:[[0,1,0],[1,1,1]]},
+       J:{c:'#3155ff',s:[[1,0,0],[1,1,1]]},L:{c:'#ff8a1f',s:[[0,0,1],[1,1,1]]},
+       S:{c:'#41d85a',s:[[0,1,1],[1,1,0]]},Z:{c:'#ff4141',s:[[1,1,0],[0,1,1]]}
+     };
+     let board=[],piece=null,next=null,bag=[],score=0,lines=0,level=1,timer=null,running=false,paused=false;
+
+     const cloneShape=s=>s.map(r=>r.slice());
+     function refillBag(){bag=['I','O','T','J','L','S','Z'];for(let i=bag.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[bag[i],bag[j]]=[bag[j],bag[i]];}}
+     function take(){if(!bag.length)refillBag();const id=bag.pop();return{id,x:3,y:0,shape:cloneShape(PIECES[id].s),color:PIECES[id].c};}
+     function reset(){board=Array.from({length:ROWS},()=>Array(COLS).fill(null));bag=[];score=0;lines=0;level=1;next=take();piece=null;scoreEl.textContent=0;linesEl.textContent=0;levelEl.textContent=1;paused=false;pauseBtn.textContent='PAUSA';}
+     function spawn(){piece=next;piece.x=Math.floor((COLS-piece.shape[0].length)/2);piece.y=0;next=take();drawNext();if(collide(piece)){gameOver();}}
+     function collide(p,dx=0,dy=0,shape=p.shape){for(let y=0;y<shape.length;y++)for(let x=0;x<shape[y].length;x++){if(!shape[y][x])continue;const nx=p.x+x+dx,ny=p.y+y+dy;if(nx<0||nx>=COLS||ny>=ROWS)return true;if(ny>=0&&board[ny][nx])return true;}return false;}
+     function rotateShape(shape,dir=1){return dir>0?shape[0].map((_,i)=>shape.map(r=>r[i]).reverse()):shape[0].map((_,i)=>shape.map(r=>r[shape[0].length-1-i]));}
+     function rotate(dir=1){const r=rotateShape(piece.shape,dir);for(const kick of [0,-1,1,-2,2]){if(!collide(piece,kick,0,r)){piece.x+=kick;piece.shape=r;return;}}}
+     function drawBlock(g,x,y,c,alpha=1,size=S){g.globalAlpha=alpha;g.fillStyle=c;g.fillRect(x*size+1,y*size+1,size-2,size-2);g.fillStyle='rgba(255,255,255,.28)';g.fillRect(x*size+2,y*size+2,size-4,3);g.fillStyle='rgba(0,0,0,.28)';g.fillRect(x*size+2,y*size+size-5,size-4,3);g.globalAlpha=1;}
+     function ghostY(){let dy=0;while(!collide(piece,0,dy+1))dy++;return piece.y+dy;}
+     function draw(){
+       ctx.fillStyle='#050505';ctx.fillRect(0,0,cv.width,cv.height);
+       ctx.strokeStyle='rgba(255,255,255,.045)';for(let x=0;x<=COLS;x++){ctx.beginPath();ctx.moveTo(x*S,0);ctx.lineTo(x*S,cv.height);ctx.stroke();}for(let y=0;y<=ROWS;y++){ctx.beginPath();ctx.moveTo(0,y*S);ctx.lineTo(cv.width,y*S);ctx.stroke();}
+       board.forEach((r,y)=>r.forEach((c,x)=>{if(c)drawBlock(ctx,x,y,c);}));
+       if(piece){
+         const gy=ghostY();piece.shape.forEach((r,y)=>r.forEach((v,x)=>{if(v)drawBlock(ctx,piece.x+x,gy+y,piece.color,.2);}));
+         piece.shape.forEach((r,y)=>r.forEach((v,x)=>{if(v)drawBlock(ctx,piece.x+x,piece.y+y,piece.color);}));
+       }
+       if(paused){ctx.fillStyle='rgba(0,0,0,.65)';ctx.fillRect(0,0,cv.width,cv.height);ctx.fillStyle='#fff';ctx.font='bold 20px monospace';ctx.textAlign='center';ctx.fillText('PAUSA',cv.width/2,cv.height/2);}
      }
-     function start(){stop();reset();running=true;draw();timer=setInterval(ghostMove,420);win.focus();}
-     function stop(){if(timer)clearInterval(timer);timer=null;running=false;}
-     function key(e){if(!running)return;if(e.key==='ArrowLeft'){e.preventDefault();move(-1,0);}if(e.key==='ArrowRight'){e.preventDefault();move(1,0);}if(e.key==='ArrowUp'){e.preventDefault();move(0,-1);}if(e.key==='ArrowDown'){e.preventDefault();move(0,1);}}
+     function drawNext(){nextCtx.fillStyle='#050505';nextCtx.fillRect(0,0,nextCv.width,nextCv.height);if(!next)return;const size=18,w=next.shape[0].length*size,h=next.shape.length*size,ox=(nextCv.width-w)/2/size,oy=(nextCv.height-h)/2/size;next.shape.forEach((r,y)=>r.forEach((v,x)=>{if(v)drawBlock(nextCtx,ox+x,oy+y,next.color,1,size);}));}
+     function lock(){piece.shape.forEach((r,y)=>r.forEach((v,x)=>{if(v&&piece.y+y>=0)board[piece.y+y][piece.x+x]=piece.color;}));let cleared=0;
+       for(let y=ROWS-1;y>=0;y--){if(board[y].every(Boolean)){board.splice(y,1);board.unshift(Array(COLS).fill(null));cleared++;y++;}}
+       if(cleared){lines+=cleared;score+=[0,100,300,500,800][cleared]*level;level=Math.floor(lines/10)+1;scoreEl.textContent=score;linesEl.textContent=lines;levelEl.textContent=level;restartTimer();}
+       spawn();
+     }
+     function restartTimer(){if(timer)clearInterval(timer);if(running&&!paused)timer=setInterval(tick,Math.max(80,700-(level-1)*55));}
+     function tick(){if(!running||paused||!piece)return;if(!collide(piece,0,1))piece.y++;else lock();draw();}
+     function hardDrop(){let n=0;while(!collide(piece,0,1)){piece.y++;n++;}score+=n*2;scoreEl.textContent=score;lock();}
+     function gameOver(){running=false;if(timer)clearInterval(timer);timer=null;pauseBtn.disabled=true;toast('Tetris: fin de la partida.');draw();}
+     function start(){if(timer)clearInterval(timer);reset();running=true;pauseBtn.disabled=false;spawn();restartTimer();draw();win.focus();}
+     function togglePause(){if(!running)return;paused=!paused;pauseBtn.textContent=paused?'CONTINUAR':'PAUSA';restartTimer();draw();}
+     function key(e){if(!running)return;const k=e.key.toLowerCase();if(['arrowleft','arrowright','arrowdown','arrowup',' ','x','z','p'].includes(k))e.preventDefault();if(k==='p'){togglePause();return;}if(paused)return;
+       if(k==='arrowleft'&&!collide(piece,-1,0))piece.x--;if(k==='arrowright'&&!collide(piece,1,0))piece.x++;if(k==='arrowdown'&&!collide(piece,0,1)){piece.y++;score++;scoreEl.textContent=score;}if(k==='arrowup'||k==='x')rotate(1);if(k==='z')rotate(-1);if(k===' ')hardDrop();draw();}
      win.tabIndex=0;win.addEventListener('keydown',key);cv.addEventListener('click',()=>win.focus());
-     win.__cleanup=()=>{stop();win.removeEventListener('keydown',key);};   // [FIX] cleanup
-     startBtn.addEventListener('click',start);reset();draw();
-   }}
+     startBtn.addEventListener('click',start);pauseBtn.addEventListener('click',togglePause);
+     win.__cleanup=()=>{if(timer)clearInterval(timer);win.removeEventListener('keydown',key);};
+     reset();draw();drawNext();
+   }},
+
+ pacman:{title:'Pac-Man',icon:pixelIcon('pacman'),render:()=>`
+   <div class="game game--pacman">
+     <div class="pac-hud">
+       <span>PUNTOS <b class="pac-score">0</b></span>
+       <span>VIDAS <b class="pac-lives">3</b></span>
+       <span>NIVEL <b class="pac-level">1</b></span>
+       <button class="btn pac-start">NUEVA PARTIDA</button>
+       <button class="btn pac-pause" disabled>PAUSA</button>
+     </div>
+     <canvas class="pac-canvas" width="380" height="340" aria-label="Laberinto de Pac-Man"></canvas>
+     <div class="game-help">Flechas para moverte · come los puntos · las bolas grandes vuelven vulnerables a los fantasmas · P pausa</div>
+   </div>`,
+   bind(b,win){
+     win=win||b.closest('.window');
+     const cv=$('.pac-canvas',b),ctx=cv.getContext('2d'),scoreEl=$('.pac-score',b),livesEl=$('.pac-lives',b),levelEl=$('.pac-level',b),startBtn=$('.pac-start',b),pauseBtn=$('.pac-pause',b);
+     const CELL=20;
+     const template=[
+       '###################',
+       '#o.......#.......o#',
+       '#.###.##.#.##.###.#',
+       '#.................#',
+       '#.###.#.#####.#.###',
+       '#.....#...#...#...#',
+       '#####.###.#.###.###',
+       '.....#.......#.....',
+       '#####.#.###.#.#####',
+       '#........P........#',
+       '#.###.##.#.##.###.#',
+       '#o..#....#....#..o#',
+       '###.#.#######.#.###',
+       '#.................#',
+       '#.#####.###.#####.#',
+       '#.................#',
+       '###################'
+     ];
+     const ROWS=template.length,COLS=template[0].length;
+     let map=[],dots=new Set(),powers=new Set(),player,ghosts=[],score=0,lives=3,level=1,timer=null,running=false,paused=false,queued={x:0,y:0},tickNo=0,frightenedUntil=0,mouth=0;
+
+     const key=(x,y)=>`${x},${y}`;
+     function walkable(x,y){if(y<0||y>=ROWS)return false;if(x<0||x>=COLS)return y===7;return map[y][x]!=='#';}
+     function wrapX(x){if(x<0)return COLS-1;if(x>=COLS)return 0;return x;}
+     function buildLevel(){
+       map=template.map(r=>r.split(''));dots.clear();powers.clear();
+       let px=9,py=9;
+       for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){const c=map[y][x];if(c==='P'){px=x;py=y;map[y][x]=' ';}if(c==='.')dots.add(key(x,y));if(c==='o')powers.add(key(x,y));}
+       player={x:px,y:py,dir:{x:0,y:0}};
+       const spawn=[[9,7,'#ff3b3b'],[8,7,'#ff8de1'],[10,7,'#39d9ff']];
+       ghosts=spawn.map(([x,y,color],i)=>({x,y,sx:x,sy:y,color,dir:{x:i===1?-1:1,y:0}}));
+       queued={x:0,y:0};frightenedUntil=0;tickNo=0;
+     }
+     function resetPositions(){player.x=9;player.y=9;player.dir={x:0,y:0};queued={x:0,y:0};ghosts.forEach(g=>{g.x=g.sx;g.y=g.sy;g.dir={x:1,y:0};});}
+     function drawWall(x,y){ctx.fillStyle='#0d2cff';ctx.fillRect(x*CELL,y*CELL,CELL,CELL);ctx.fillStyle='#02040c';ctx.fillRect(x*CELL+4,y*CELL+4,CELL-8,CELL-8);}
+     function drawPac(){const cx=player.x*CELL+10,cy=player.y*CELL+10;mouth=(mouth+.18)%(Math.PI/2);const open=.18+Math.abs(Math.sin(mouth))*.36;let ang=0;if(player.dir.x<0)ang=Math.PI;if(player.dir.y<0)ang=-Math.PI/2;if(player.dir.y>0)ang=Math.PI/2;ctx.fillStyle='#ffd51f';ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,8,ang+open,ang+Math.PI*2-open);ctx.closePath();ctx.fill();}
+     function drawGhost(g,fright){const x=g.x*CELL+10,y=g.y*CELL+10;ctx.fillStyle=fright?'#194cff':g.color;ctx.beginPath();ctx.arc(x,y-1,8,Math.PI,0);ctx.lineTo(x+8,y+7);ctx.lineTo(x+4,y+4);ctx.lineTo(x,y+7);ctx.lineTo(x-4,y+4);ctx.lineTo(x-8,y+7);ctx.closePath();ctx.fill();ctx.fillStyle='#fff';ctx.fillRect(x-5,y-2,4,5);ctx.fillRect(x+2,y-2,4,5);ctx.fillStyle=fright?'#fff':'#182050';ctx.fillRect(x-4,y,2,3);ctx.fillRect(x+3,y,2,3);}
+     function draw(){ctx.fillStyle='#000';ctx.fillRect(0,0,cv.width,cv.height);for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++)if(map[y][x]==='#')drawWall(x,y);
+       ctx.fillStyle='#f6d7a7';dots.forEach(k=>{const [x,y]=k.split(',').map(Number);ctx.beginPath();ctx.arc(x*CELL+10,y*CELL+10,2,0,Math.PI*2);ctx.fill();});
+       powers.forEach(k=>{const [x,y]=k.split(',').map(Number);ctx.beginPath();ctx.arc(x*CELL+10,y*CELL+10,5,0,Math.PI*2);ctx.fill();});
+       drawPac();const fright=performance.now()<frightenedUntil;ghosts.forEach(g=>drawGhost(g,fright));
+       if(paused){ctx.fillStyle='rgba(0,0,0,.65)';ctx.fillRect(0,0,cv.width,cv.height);ctx.fillStyle='#fff';ctx.font='bold 20px monospace';ctx.textAlign='center';ctx.fillText('PAUSA',cv.width/2,cv.height/2);}
+     }
+     function eat(){const k=key(player.x,player.y);if(dots.delete(k)){score+=10;scoreEl.textContent=score;}if(powers.delete(k)){score+=50;scoreEl.textContent=score;frightenedUntil=performance.now()+6500;beep();}if(!dots.size&&!powers.size){level++;levelEl.textContent=level;toast('Pac-Man: nivel completado.');buildLevel();restartTimer();}}
+     function canDir(pos,dir){let nx=pos.x+dir.x,ny=pos.y+dir.y;if(ny===7)nx=wrapX(nx);return walkable(nx,ny);}
+     function moveEntity(ent,dir){let nx=ent.x+dir.x,ny=ent.y+dir.y;if(ny===7)nx=wrapX(nx);if(walkable(nx,ny)){ent.x=nx;ent.y=ny;ent.dir={...dir};return true;}return false;}
+     function chooseGhost(g){
+       const dirs=[{x:1,y:0},{x:-1,y:0},{x:0,y:1},{x:0,y:-1}].filter(d=>canDir(g,d));
+       const noBack=dirs.filter(d=>!(d.x===-g.dir.x&&d.y===-g.dir.y));const pool=noBack.length?noBack:dirs;if(!pool.length)return g.dir;
+       const fright=performance.now()<frightenedUntil;if(fright||Math.random()<.15)return pool[Math.floor(Math.random()*pool.length)];
+       return pool.reduce((best,d)=>{const nx=wrapX(g.x+d.x),ny=g.y+d.y,dist=Math.abs(nx-player.x)+Math.abs(ny-player.y);return dist<best.dist?{d,dist}:best;},{d:pool[0],dist:Infinity}).d;
+     }
+     function collision(){for(const g of ghosts){if(g.x===player.x&&g.y===player.y){if(performance.now()<frightenedUntil){score+=200;scoreEl.textContent=score;g.x=g.sx;g.y=g.sy;toast('+200 · fantasma capturado');}else{lives--;livesEl.textContent=lives;if(lives<=0){gameOver();}else{toast(`Te quedan ${lives} vidas.`);resetPositions();}return;}}}}
+     function step(){if(!running||paused)return;if(canDir(player,queued))player.dir={...queued};if(player.dir.x||player.dir.y)moveEntity(player,player.dir);eat();collision();tickNo++;if(tickNo%2===0){ghosts.forEach(g=>moveEntity(g,chooseGhost(g)));collision();}draw();}
+     function restartTimer(){if(timer)clearInterval(timer);if(running&&!paused)timer=setInterval(step,Math.max(80,125-(level-1)*5));}
+     function start(){if(timer)clearInterval(timer);score=0;lives=3;level=1;scoreEl.textContent=0;livesEl.textContent=3;levelEl.textContent=1;running=true;paused=false;pauseBtn.disabled=false;pauseBtn.textContent='PAUSA';buildLevel();restartTimer();draw();win.focus();}
+     function gameOver(){running=false;if(timer)clearInterval(timer);timer=null;pauseBtn.disabled=true;toast('Pac-Man: fin de la partida.');draw();}
+     function togglePause(){if(!running)return;paused=!paused;pauseBtn.textContent=paused?'CONTINUAR':'PAUSA';restartTimer();draw();}
+     function keydown(e){const k=e.key.toLowerCase();const dirs={arrowleft:{x:-1,y:0},arrowright:{x:1,y:0},arrowup:{x:0,y:-1},arrowdown:{x:0,y:1}};if(dirs[k]){e.preventDefault();queued=dirs[k];}else if(k==='p'){e.preventDefault();togglePause();}}
+     win.tabIndex=0;win.addEventListener('keydown',keydown);cv.addEventListener('click',()=>win.focus());startBtn.addEventListener('click',start);pauseBtn.addEventListener('click',togglePause);
+     win.__cleanup=()=>{if(timer)clearInterval(timer);win.removeEventListener('keydown',keydown);};
+     buildLevel();draw();
+   }},
+
+ easter:{title:'SECRETO.sys',icon:'🥚',render:()=>`
+   <div class="secret-screen">
+     <div class="secret-skull">☠</div>
+     <h2>HAS ENCONTRADO UNA PARTE OCULTA DE JOSEMI_OS</h2>
+     <p>Un portfolio cuenta lo que ya sabes hacer. Este sistema también quiere contar lo que todavía estás intentando conseguir.</p>
+     <p class="secret-code">PISTA: prueba <b>matrix</b>, <b>cafe</b>, <b>42</b> y el código Konami en la terminal o con el teclado.</p>
+   </div>`}
 };
 // Genera el HTML repetido de una barra de habilidad; data-w guarda el porcentaje.
 function bar(n,v){return `<div class="res"><div class="res__top"><span>${n}</span><span>${v}%</span></div><div class="bar"><i data-w="${v}"></i></div></div>`;}
@@ -378,32 +466,43 @@ const WM=(()=>{let z=10,open=new Map(),x=40,y=30;
 const openWindow=WM.openWindow;
 
 /* ========================================================= TERMINAL */
-function runCommand(raw,print,openWin){const p=raw.split(' '),c=p[0],a=p.slice(1).join(' ');
-  // switch selecciona una respuesta según la primera palabra escrita por el usuario.
-  switch(c){case'':break;
-    case'help':print('Comandos: <span class="ok">help whoami about projects skills contact clear date echo ls cat sudo secret matrix wallpaper tetris pacman coffee hello</span>');break;
-    case'whoami':print('Josemi<br>DAM Student<br>Developer in progress.');break;
-    case'about':print('Opening About Me...');openWin('about');break;
-    case'projects':print('Opening Projects...');openWin('projects');break;
-    case'skills':print('Opening Skills...');openWin('skills');break;
-    case'contact':print('Opening Contact...');openWin('contact');break;
-    case'clear':$('#term-out').innerHTML='';break;
-    case'date':print(new Date().toString());break;
-    case'echo':print(a||'');break;
-    case'ls':print('about.txt  projects/  skills.json  contact.txt  secret/');break;
-    case'cat':print(a==='about.txt'?'Estudiante de DAM. Aprendo creando. Me gusta el código limpio y el diseño sobrio.':`cat: ${a||'(no such file)'}: no such file or directory`);break;
-    case'sudo':if(a.startsWith('rm -rf')){print('<span class="err">Nice try.</span>');break;}print('Permission granted.\nLaunching contact protocol...');openWin('contact');break;
-    case'secret':print('<span class="ok">🔓 Easter egg unlocked.</span>');toast('Secret found.');break;
-    // [FIX] 'matrix' ara activa el WALLPAPER persistent (no només l'efecte temporal).
-    case'matrix':state.wp=4;applyTheme();save();print('<span class="ok">Matrix wallpaper ACTIVADO.</span> Escriu "wallpaper 0" per a eixir.');break;
-    // [NOU] 'wallpaper' per a canviar el fons des de la terminal.
-    case'wallpaper':if(a==='matrix'){state.wp=4;applyTheme();save();print('Matrix ON.');}else if(['0','1','2','3'].includes(a)){state.wp=+a;applyTheme();save();print('Wallpaper canviat.');}else print('Ús: wallpaper matrix|0|1|2|3');break;
-    // [NOU] Obrir jocs des de la terminal.
-    case'tetris':print('Obrint Tetris...');openWin('tetris');break;
-    case'pacman':print('Obrint Pac-Man...');openWin('pacman');break;
-    case'coffee':print('Compiling...\n☕ Coffee loaded successfully.');break;
-    case'hello':print('Hello, human.');break;
-    default:print(`<span class="err">command not found: ${c}</span>`);}}
+function runCommand(raw,print,openWin){
+  const p=raw.trim().split(/\s+/),c=(p[0]||'').toLowerCase(),a=p.slice(1).join(' ');
+  switch(c){
+    case'':break;
+    case'help':case'ayuda':
+      print('Comandos: <span class="ok">ayuda quien-soy sobre-mi proyectos habilidades contacto limpiar fecha eco ls cat sudo secreto matrix fondo tetris pacman arcade cafe hola 42</span>');break;
+    case'whoami':case'quien-soy':print('Josemi<br>Estudiante de DAM<br>Desarrollador en construcción.');break;
+    case'about':case'sobre-mi':print('Abriendo Sobre mí...');openWin('about');break;
+    case'projects':case'proyectos':print('Abriendo Proyectos...');openWin('projects');break;
+    case'skills':case'habilidades':print('Abriendo Habilidades...');openWin('skills');break;
+    case'contact':case'contacto':print('Abriendo Contacto...');openWin('contact');break;
+    case'clear':case'limpiar':$('#term-out').innerHTML='';break;
+    case'date':case'fecha':print(new Date().toLocaleString('es-ES'));break;
+    case'echo':case'eco':print(a||'');break;
+    case'ls':print('sobre-mi.txt  proyectos/  habilidades.json  contacto.txt  juegos/  secreto/');break;
+    case'cat':
+      if(a==='sobre-mi.txt'||a==='about.txt')print('Estudiante de DAM. Aprendo creando. Este archivo todavía tiene partes que debemos personalizar juntos.');
+      else if(a==='sueños.txt'||a==='suenos.txt')print('<span class="ok">[ARCHIVO BLOQUEADO]</span> Falta que Josemi escriba aquí exactamente qué quiere conseguir.');
+      else print(`cat: ${a||'(sin archivo)'}: no existe`);break;
+    case'sudo':
+      if(a.startsWith('rm -rf')){print('<span class="err">Buen intento. JOSEMI_OS se niega a autodestruirse.</span>');break;}
+      print('Permiso concedido.\nLanzando protocolo de contacto...');openWin('contact');break;
+    case'secret':case'secreto':print('<span class="ok">🔓 Easter egg desbloqueado.</span>');openWin('easter');toast('Has encontrado SECRETO.sys');break;
+    case'matrix':state.wp=4;applyTheme();save();print('<span class="ok">Fondo Matrix activado.</span> Usa "fondo 0" para salir.');break;
+    case'wallpaper':case'fondo':
+      if(a==='matrix'){state.wp=4;applyTheme();save();print('Matrix activado.');}
+      else if(['0','1','2','3'].includes(a)){state.wp=+a;applyTheme();save();print('Fondo cambiado.');}
+      else print('Uso: fondo matrix|0|1|2|3');break;
+    case'tetris':print('Abriendo Tetris...');openWin('tetris');break;
+    case'pacman':print('Abriendo Pac-Man...');openWin('pacman');break;
+    case'arcade':print('Abriendo Arcade...');openWin('arcade');break;
+    case'coffee':case'cafe':print('Compilando...\n☕ Café cargado correctamente. Productividad +10.');toast('Café virtual servido ☕');break;
+    case'hello':case'hola':print('Hola, humano. JOSEMI_OS te está observando 👀');break;
+    case'42':print('<span class="ok">42.</span> La respuesta estaba aquí. La pregunta sigue pendiente.');openWin('easter');break;
+    default:print(`<span class="err">comando no encontrado: ${c}</span>`);
+  }
+}
 // (Opcional) Efecte temporal de Matrix 5s, usat pel mode "matrix" del boot.
 function matrixMode(){const c=document.createElement('canvas');Object.assign(c.style,{position:'fixed',inset:'0',zIndex:'9998',background:'#000',opacity:'.9'});
   document.body.appendChild(c);const x=c.getContext('2d');c.width=innerWidth;c.height=innerHeight;
@@ -414,40 +513,40 @@ function matrixMode(){const c=document.createElement('canvas');Object.assign(c.s
 
 /* ========================================================= PROYECTOS */
 const PROJECTS={
- java:{name:'Java Basics',desc:'Prácticas de POO en Java: clases, herencia, colecciones.',lang:'Java',db:'—',fw:'—',date:'2024',status:'done',tags:['Java','OOP']},
- web:{name:'JOSEMI OS',desc:'Este mismo portfolio-sistema. HTML/CSS/JS vanilla.',lang:'HTML/CSS/JS',db:'—',fw:'CSS Grid',date:'2025',status:'dev',tags:['Web','Vanilla JS']},
- exp:{name:'Experiments',desc:'Prototipos rápidos para aprender tecnologías nuevas.',lang:'Varios',db:'—',fw:'Varios',date:'2025',status:'exp',tags:['R&D']},
- school:{name:'School Projects',desc:'Trabajos de 1º DAM: bases de datos, apps, etc.',lang:'Java/SQL',db:'PostgreSQL',fw:'—',date:'2024',status:'done',tags:['DAM']}};
+ java:{name:'Prácticas de Java',desc:'Prácticas de POO en Java: clases, herencia y colecciones.',lang:'Java',db:'—',fw:'—',date:'POR CONFIRMAR',status:'done',tags:['Java','POO']},
+ web:{name:'JOSEMI OS',desc:'Este portfolio convertido en sistema operativo, construido con HTML, CSS y JavaScript.',lang:'HTML/CSS/JS',db:'—',fw:'Vanilla',date:'2026',status:'dev',tags:['Web','JavaScript']},
+ exp:{name:'Experimentos',desc:'Prototipos rápidos para aprender tecnologías nuevas.',lang:'Varios',db:'—',fw:'Varios',date:'POR CONFIRMAR',status:'exp',tags:['I+D']},
+ school:{name:'Proyectos de clase',desc:'Trabajos de DAM: bases de datos, Java, aplicaciones y ejercicios.',lang:'Java/SQL',db:'PostgreSQL',fw:'—',date:'POR CONFIRMAR',status:'dev',tags:['DAM']}
+};
 function openProject(k){const p=PROJECTS[k];if(!p)return;const id='proj-'+k;
   Apps[id]={title:p.name,icon:'📂',render:()=>`<div class="app-title">${p.name.toUpperCase()}</div><p class="bio">${p.desc}</p>
     <div class="proj">${p.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
-    <dl class="kv"><dt>Language</dt><dd>${p.lang}</dd><dt>Database</dt><dd>${p.db}</dd><dt>Framework</dt><dd>${p.fw}</dd><dt>Date</dt><dd>${p.date}</dd></dl>
-    <span class="status ${p.status}">${p.status==='done'?'COMPLETED':p.status==='dev'?'IN DEVELOPMENT':'EXPERIMENTAL'}</span>
-    <div class="btn-row"><button class="btn btn--accent">VIEW PROJECT</button><button class="btn">VIEW SOURCE CODE</button></div>`};
-  openWindow(id);}
+    <dl class="kv"><dt>Lenguaje</dt><dd>${p.lang}</dd><dt>Base de datos</dt><dd>${p.db}</dd><dt>Framework</dt><dd>${p.fw}</dd><dt>Fecha</dt><dd>${p.date}</dd></dl>
+    <span class="status ${p.status}">${p.status==='done'?'COMPLETADO':p.status==='dev'?'EN DESARROLLO':'EXPERIMENTAL'}</span>
+    <div class="btn-row"><button class="btn btn--accent" data-project-action="demo">VER PROYECTO</button><button class="btn" data-project-action="source">VER CÓDIGO</button></div>
+    <p class="profile-note">Los enlaces reales de cada proyecto todavía no están configurados.</p>`,
+    bind(b){b.querySelectorAll('[data-project-action]').forEach(btn=>btn.onclick=()=>toast('Falta añadir el enlace real de este proyecto.'));}};
+  openWindow(id);
+}
 
 /* ========================================================= BOOT */
-const BOOTL=['Initializing kernel...','Loading user profile...','Loading projects...','Loading skills...','Starting interface...'];
-async function boot(){const log=$('#boot__log');log.innerHTML='';$('#boot').classList.remove('out','hidden','glitch');
-  for(const l of BOOTL){await sleep(380);log.innerHTML+=`<div><span class="ok">[ OK ]</span> ${l}</div>`;}
-  await sleep(500);log.innerHTML+=`<div class="granted">ACCESS GRANTED</div>`;await sleep(700);
-  $('#boot').classList.add('out');await sleep(500);$('#boot').classList.add('hidden');
-  const sp=$('#splash'); sp.classList.remove('hidden');await sleep(1600);
-  sp.classList.add('out');await sleep(500);sp.classList.add('hidden');
+const BOOTL=['Inicializando núcleo...','Cargando perfil de Josemi...','Montando proyectos...','Cargando habilidades...','Iniciando interfaz...'];
+async function boot(){$('#desktop').classList.add('hidden');stopMatrix();const log=$('#boot__log');log.innerHTML='';$('#boot').classList.remove('out','hidden','glitch');
+  for(const l of BOOTL){await sleep(220);log.innerHTML+=`<div><span class="ok">[ OK ]</span> ${l}</div>`;}
+  await sleep(300);log.innerHTML+=`<div class="granted">ACCESO CONCEDIDO</div>`;await sleep(420);
+  $('#boot').classList.add('out');await sleep(320);$('#boot').classList.add('hidden');
+  const sp=$('#splash'); sp.classList.remove('hidden');await sleep(900);
+  sp.classList.add('out');await sleep(320);sp.classList.add('hidden');
   $('#desktop').classList.remove('hidden');
   // [FIX] Ara sí: apliquem el tema DESPRÉS de mostrar el desktop => Matrix s'activa si wp=4.
   applyTheme();
-  if(currentUser){
-    (currentUser.auto||[]).forEach(a=>openWindow(a));
-    if(currentUser.mode==='matrix') matrixMode();
-    if(currentUser.mode==='dev') toast('Mode administrador activat.');
-    toast('Benvingut, '+currentUser.nom+'.');
-  }
+  (currentUser.auto||[]).forEach(a=>openWindow(a));
+  toast('Bienvenido a JOSEMI_OS, '+currentUser.nom+'.');
 }
 
 /* ========================================================= ESCRITORIO */
 // [FIX] Añadidos 'tetris' y 'pacman' perquè tinguen acces directe.
-const ICONS=['about','projects','skills','terminal','readme','contact','trash','settings','system','tetris','pacman'];
+const ICONS=['about','projects','skills','terminal','readme','contact','arcade','trash','settings','system'];
 let startTime=Date.now();
 function buildIcons(){const c=$('#icons');c.innerHTML='';
   const llista=(currentUser&&currentUser.apps)?currentUser.apps:ICONS;
@@ -483,139 +582,93 @@ function buildContext(){const ctx=$('#ctxmenu');
   document.addEventListener('click',()=>ctx.classList.add('hidden'));
   addEventListener('keydown',e=>{if(e.key==='Escape')ctx.classList.add('hidden');});
   ctx.querySelectorAll('button').forEach(b=>b.onclick=()=>{const a=b.dataset.act;ctx.classList.add('hidden');
-    if(a==='refresh'){buildIcons();toast('Refreshed.');}
+    if(a==='refresh'){buildIcons();toast('Escritorio actualizado.');}
     // [FIX] array de noms ara inclou 'Matrix' (5 wallpapers).
-    if(a==='wallpaper'){state.wp=(state.wp+1)%WALLS.length;applyTheme();save();toast('Wallpaper '+['Teal','Slate','Ocean','Steel','Matrix'][state.wp]);}
-    if(a==='terminal')openWindow('terminal');if(a==='system')openWindow('system');});}
-function shutdown(){const s=$('#shutdown');s.classList.remove('hidden');$('#shutdown__msg').textContent='Shutting down JOSEMI OS...';
-  setTimeout(()=>{$('#shutdown__msg').textContent='It is now safe to close this tab.';$('#reboot').classList.remove('hidden');},1600);
-  $('#reboot').onclick=()=>{s.classList.add('hidden');$('#reboot').classList.add('hidden');showLogin();};}
-function buildKonami(){const s=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];let i=0;
-  addEventListener('keydown',e=>{if(e.key===s[i])i++;else if(e.key===s[0])i=1;else i=0;if(i===s.length){toast('Developer Mode Enabled.');i=0;}});}
+    if(a==='wallpaper'){state.wp=(state.wp+1)%WALLS.length;applyTheme();save();toast('Fondo: '+['Turquesa','Verde oscuro','Océano','Acero','Matrix'][state.wp]);}
+    if(a==='terminal')openWindow('terminal');if(a==='system')openWindow('system');if(a==='arcade')openWindow('arcade');});}
+function shutdown(){const s=$('#shutdown');s.classList.remove('hidden');$('#shutdown__msg').textContent='Apagando JOSEMI OS...';
+  setTimeout(()=>{$('#shutdown__msg').textContent='Ahora puedes cerrar esta pestaña con seguridad.';$('#reboot').classList.remove('hidden');},1600);
+  $('#reboot').onclick=()=>location.reload();}
+function buildKonami(){
+  const s=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];let i=0;
+  addEventListener('keydown',e=>{const key=e.key.length===1?e.key.toLowerCase():e.key;if(key===s[i])i++;else if(key===s[0])i=1;else i=0;
+    if(i===s.length){state.wp=4;applyTheme();save();toast('Código Konami: MODO DESARROLLADOR ACTIVADO');openWindow('easter');i=0;}});
+  let clockClicks=0,clockTimer=null;
+  $('#clock__time').addEventListener('click',()=>{clockClicks++;clearTimeout(clockTimer);clockTimer=setTimeout(()=>clockClicks=0,1500);if(clockClicks>=7){clockClicks=0;openWindow('easter');toast('Has forzado una anomalía temporal.');}});
+  let typed='';
+  addEventListener('keydown',e=>{if(e.target.matches('input,textarea'))return;if(e.key.length!==1)return;typed=(typed+e.key.toLowerCase()).slice(-12);if(typed.endsWith('josemi')){toast('Usuario raíz detectado.');openWindow('about');typed='';}});
+}
 
-/* ========================================================= PERFILES
-   Cada contraseña selecciona un perfil, su color y las aplicaciones permitidas.
+/* ========================================================= ACCESO DIRECTO
+   Ya no hay contraseña: el perfil de Josemi se carga automáticamente.
    ========================================================= */
-const USERS={
-  // [FIX] 'tetris' i 'pacman' afegits a josemi i zoe => acces directe per a tu.
-  "josemi":  {nom:"Josemi",  rol:"propietari",   color:"#6C63FF", apps:["about","projects","skills","terminal","readme","contact","trash","settings","system","tetris","pacman"], auto:[]},
-  "invitado":{nom:"Invitado",rol:"convidat",     color:"#008080", apps:["about","contact"], auto:["about"]},
-  "zoe":     {nom:"Zoe",     rol:"administrador",color:"#4ade80", apps:["about","projects","skills","terminal","readme","contact","trash","settings","system","tetris","pacman"], auto:["terminal"], mode:"dev"},
-  "matrix":  {nom:"Agent",   rol:"despertar",    color:"#4ade80", apps:["about","terminal"], auto:["terminal"], mode:"matrix"}
+const currentUser={
+  nom:'Josemi',
+  rol:'Estudiante de DAM',
+  color:'#6C63FF',
+  apps:['about','projects','skills','terminal','readme','contact','arcade','trash','settings','system'],
+  auto:[]
 };
-let currentUser=null;
 
-/* ========================================================= LOGIN */
-const ASCII_FX_DURATION=3600;
+const ASCII_FX_DURATION=3200;
 const clamp01=n=>Math.max(0,Math.min(1,n));
 const easeOutCubic=n=>1-Math.pow(1-n,3);
+let enteringOS=false;
 
-// Devuelve un número estable entre 0 y 1 para cada coordenada. Parece aleatorio,
-// pero siempre produce la misma película y evita que el dibujo parpadee sin control.
 function asciiSeed(x,y,salt=0){return ((x*73+y*151+salt*199+x*y*17)%997)/997;}
 
-// Produce un fotograma de texto. Cada carácter viaja desde una coordenada inicial
-// hasta su posición definitiva, como hacen los motores de efectos de terminal.
 function renderLoginFrame(text,kind,elapsed){
-  if((kind==='computer'&&elapsed>=2180)||(kind==='logo'&&elapsed>=3300))return text;
+  if((kind==='computer'&&elapsed>=2000)||(kind==='logo'&&elapsed>=2900))return text;
   const rows=text.split('\n'),width=Math.max(...rows.map(row=>row.length)),height=rows.length;
-  const canvas=Array.from({length:height},()=>Array(width).fill(' '));
-  const noise='01#$%?+*:/\\';
-
+  const canvas=Array.from({length:height},()=>Array(width).fill(' ')),noise='01#$%?+*:/\\';
   rows.forEach((row,y)=>[...row].forEach((char,x)=>{
-    if(char===' ')return;
-    const seed=asciiSeed(x,y,kind==='computer'?1:2);
-
+    if(char===' ')return;const seed=asciiSeed(x,y,kind==='computer'?1:2);
     if(kind==='computer'){
-      if(char==='0'||char==='1'){
-        const age=elapsed-(720+seed*380);
-        if(age<0)return;
-        if(age<920){const symbol=noise[(Math.floor(age/48)+x*5+y*3)%noise.length];canvas[y][x]=symbol;}else canvas[y][x]=char;
-        return;
-      }
-      const local=clamp01((elapsed-seed*320)/820);
-      if(local<=0)return;
-      const side=Math.floor(seed*4),sx=side===0?0:side===1?width-1:Math.floor(seed*width);
-      const sy=side===2?0:side===3?height-1:Math.floor(asciiSeed(x,y,8)*height);
-      const ease=easeOutCubic(local);
-      const px=Math.round(sx+(x-sx)*ease),py=Math.round(sy+(y-sy)*ease);
-      canvas[py][px]=local<.72?noise[(x+y+Math.floor(elapsed/55))%noise.length]:char;
-      return;
+      if(char==='0'||char==='1'){const age=elapsed-(620+seed*360);if(age<0)return;if(age<820)canvas[y][x]=noise[(Math.floor(age/48)+x*5+y*3)%noise.length];else canvas[y][x]=char;return;}
+      const local=clamp01((elapsed-seed*300)/760);if(local<=0)return;const side=Math.floor(seed*4),sx=side===0?0:side===1?width-1:Math.floor(seed*width),sy=side===2?0:side===3?height-1:Math.floor(asciiSeed(x,y,8)*height),ease=easeOutCubic(local),px=Math.round(sx+(x-sx)*ease),py=Math.round(sy+(y-sy)*ease);
+      canvas[py][px]=local<.72?noise[(x+y+Math.floor(elapsed/55))%noise.length]:char;return;
     }
-
-    const local=clamp01((elapsed-(2180+seed*260))/820);
-    if(local<=0)return;
-    if(local>=1){canvas[y][x]=char;return;}
-    const sx=Math.floor(asciiSeed(x,y,4)*width),sy=Math.floor(asciiSeed(x,y,9)*height);
-    const ease=easeOutCubic(local),px=Math.round(sx+(x-sx)*ease),py=Math.round(sy+(y-sy)*ease);
+    const local=clamp01((elapsed-(1950+seed*230))/720);if(local<=0)return;if(local>=1){canvas[y][x]=char;return;}
+    const sx=Math.floor(asciiSeed(x,y,4)*width),sy=Math.floor(asciiSeed(x,y,9)*height),ease=easeOutCubic(local),px=Math.round(sx+(x-sx)*ease),py=Math.round(sy+(y-sy)*ease);
     canvas[py][px]=local>.78?char:noise[(x*3+y+Math.floor(elapsed/50))%noise.length];
   }));
-
-  if(kind==='computer'&&elapsed>1760&&elapsed<2180){
-    const band=Math.floor((elapsed-1760)/70)%Math.max(1,height-4)+2;
-    for(let y=band;y<Math.min(height,band+2);y++){
-      const shift=y%2?2:-2,row=canvas[y].slice();
-      canvas[y].fill(' ');
-      row.forEach((char,x)=>{const nx=x+shift;if(nx>=0&&nx<width)canvas[y][nx]=char;});
-    }
-  }
   return canvas.map(row=>row.join('')).join('\n');
+}
+
+function enterOS(){
+  if(enteringOS)return;enteringOS=true;
+  const login=$('#login');
+  document.documentElement.style.setProperty('--accent',currentUser.color);
+  $('.menu__head strong').textContent=currentUser.nom;
+  $('.menu__head small').textContent=currentUser.rol;
+  buildIcons();buildMenu();beep();
+  login.classList.add('out');
+  setTimeout(()=>{login.classList.add('hidden');boot();},500);
 }
 
 function typeLoginArt(){
   const login=$('#login'),status=$('#loginSequenceText'),bar=$('#loginSequenceBar');
   login.classList.remove('ascii-ready');login.classList.add('ascii-intro');
-
-  const parts=$$('.login__computer,.login__ascii').map(el=>{
-    const text=el.textContent,spacer=document.createElement('span'),ink=document.createElement('span');
-    spacer.textContent=text;spacer.className='ascii-spacer';spacer.setAttribute('aria-hidden','true');
-    ink.className='ascii-ink';ink.setAttribute('aria-hidden','true');
-    el.classList.add('ascii-typing');el.replaceChildren(spacer,ink);
-    return {el,text,ink,kind:el.classList.contains('login__computer')?'computer':'logo'};
-  });
+  const parts=$$('.login__computer,.login__ascii').map(el=>{const text=el.textContent,spacer=document.createElement('span'),ink=document.createElement('span');spacer.textContent=text;spacer.className='ascii-spacer';spacer.setAttribute('aria-hidden','true');ink.className='ascii-ink';ink.setAttribute('aria-hidden','true');el.classList.add('ascii-typing');el.replaceChildren(spacer,ink);return{el,text,ink,kind:el.classList.contains('login__computer')?'computer':'logo'};});
   const started=performance.now();
-  function finish(){
-    for(const part of parts){part.el.textContent=part.text;part.el.classList.remove('ascii-typing');}
-    login.classList.remove('ascii-intro','ascii-pulse','ascii-glitch');login.classList.add('ascii-ready');
-    status.textContent='[ ACCESS TERMINAL READY ]';bar.textContent='[########################] 100%';
-    setTimeout(()=>$('#loginPass').focus(),180);
-  }
-  function frame(now){
-    const elapsed=now-started,progress=clamp01(elapsed/ASCII_FX_DURATION);
-    if(elapsed>=ASCII_FX_DURATION||login.classList.contains('out')||login.classList.contains('hidden')){finish();return;}
-    for(const part of parts)part.ink.textContent=renderLoginFrame(part.text,part.kind,elapsed);
-
-    login.classList.toggle('ascii-pulse',elapsed>1320&&elapsed<1710||elapsed>3020&&elapsed<3300);
-    login.classList.toggle('ascii-glitch',elapsed>1760&&elapsed<2180&&Math.floor(elapsed/70)%2===0);
-    status.textContent=elapsed<650?'> WAKE SIGNAL RECEIVED_':elapsed<1320?'> BUILDING ASCII DISPLAY...':elapsed<2180?'> DECRYPTING BINARY CORE...':elapsed<3100?'> LOADING JOSEMI_OS...':'> VERIFYING ACCESS TERMINAL...';
-    const filled=Math.round(progress*24);
-    bar.textContent=`[${'#'.repeat(filled)}${'.'.repeat(24-filled)}] ${String(Math.round(progress*100)).padStart(3,' ')}%`;
-    requestAnimationFrame(frame);
-  }
-  for(const part of parts)part.ink.textContent=renderLoginFrame(part.text,part.kind,0);
-  requestAnimationFrame(frame);
+  function finish(){for(const part of parts){part.el.textContent=part.text;part.el.classList.remove('ascii-typing');}login.classList.remove('ascii-intro','ascii-pulse','ascii-glitch');login.classList.add('ascii-ready');status.textContent='[ PERFIL VERIFICADO · ACCESO DIRECTO ]';bar.textContent='[########################] 100%';setTimeout(enterOS,260);}
+  function frame(now){const elapsed=now-started,progress=clamp01(elapsed/ASCII_FX_DURATION);if(elapsed>=ASCII_FX_DURATION||login.classList.contains('out')||login.classList.contains('hidden')){finish();return;}for(const part of parts)part.ink.textContent=renderLoginFrame(part.text,part.kind,elapsed);
+    login.classList.toggle('ascii-pulse',(elapsed>1200&&elapsed<1550)||(elapsed>2700&&elapsed<2950));
+    status.textContent=elapsed<550?'> SEÑAL RECIBIDA_':elapsed<1200?'> CONSTRUYENDO PANTALLA ASCII...':elapsed<1950?'> DESCIFRANDO NÚCLEO BINARIO...':elapsed<2700?'> CARGANDO JOSEMI_OS...':'> CARGANDO PERFIL DE JOSEMI...';
+    const filled=Math.round(progress*24);bar.textContent=`[${'#'.repeat(filled)}${'.'.repeat(24-filled)}] ${String(Math.round(progress*100)).padStart(3,' ')}%`;requestAnimationFrame(frame);}
+  for(const part of parts)part.ink.textContent=renderLoginFrame(part.text,part.kind,0);requestAnimationFrame(frame);
 }
-function showLogin(){const l=$('#login');l.classList.remove('hidden','out');
-  $('#loginPass').value='';$('#loginErr').textContent='';$('#loginGo').disabled=true;typeLoginArt();}
-function initLogin(){
-  const login=$('#login'),pass=$('#loginPass'),go=$('#loginGo'),eye=$('#loginEye'),err=$('#loginErr');
-  pass.addEventListener('input',()=>{go.disabled=pass.value.length===0;});
-  eye.addEventListener('click',()=>{const show=pass.type==='password';pass.type=show?'text':'password';eye.textContent=show?'[-]':'[*]';eye.setAttribute('aria-label',show?'Ocultar contraseña':'Mostrar contraseña');});
-  $('#loginForm').addEventListener('submit',e=>{e.preventDefault();
-    const u=USERS[pass.value];
-    if(!u){login.classList.remove('shake');void login.offsetWidth;login.classList.add('shake');
-      err.textContent='Contrasenya incorrecta.';pass.select();beep();return;}
-    currentUser=u;
-    document.documentElement.style.setProperty('--accent',u.color);
-    $('.menu__head strong').textContent=u.nom;
-    $('.menu__head small').textContent=u.rol;
-    buildIcons();buildMenu();
-    beep();
-    login.classList.add('out');setTimeout(()=>login.classList.add('hidden'),600);
-    boot();
-  });
-  // El foco se asigna al terminar la animación para que el cursor no distraiga antes.
+
+function showLogin(){
+  enteringOS=false;
+  $('#desktop').classList.add('hidden');stopMatrix();
+  const l=$('#login');l.classList.remove('hidden','out');typeLoginArt();
+}
+
+function initDirectAccess(){
+  $('#login').addEventListener('click',e=>{if(e.target.closest('a,button'))return;enterOS();});
+  addEventListener('keydown',e=>{if(!$('#login').classList.contains('hidden')&&(e.key==='Enter'||e.key===' ')){e.preventDefault();enterOS();}});
 }
 
 /* ========================================================= INICIO */
-buildIcons();buildMenu();buildClock();buildParallax();buildCursor();buildStart();buildContext();buildKonami();initLogin();typeLoginArt();
+buildIcons();buildMenu();buildClock();buildParallax();buildCursor();buildStart();buildContext();buildKonami();initDirectAccess();typeLoginArt();

@@ -91,19 +91,10 @@
       <!-- JavaScript actualiza esta línea y la barra durante la secuencia de entrada. -->
       <!-- [INTEGRACIÓ LOGIN] El JS escriurà ací "> AUTHENTICATING..." i omplirà la barra. -->
       <div class="login__sequence" id="loginSequence" aria-live="polite">
-        <span id="loginSequenceText">&gt; WAITING FOR SIGNAL_</span>
+        <span id="loginSequenceText">&gt; ESPERANDO SEÑAL_</span>
         <span id="loginSequenceBar">[........................] 0%</span>
       </div>
-      <form class="login__form" id="loginForm" autocomplete="off">
-        <div class="login__field">
-          <!-- type=password oculta los caracteres. El botón [*] cambia temporalmente a type=text. -->
-          <input type="password" id="loginPass" placeholder="Password" autocomplete="off">
-          <button type="button" id="loginEye" aria-label="Mostrar contraseña">[*]</button>
-          <button type="submit" id="loginGo" aria-label="Entrar" disabled>&gt;</button>
-        </div>
-      </form>
-      <p class="login__hint">Pista: <span id="loginHint">josemi</span></p>
-      <p class="login__err" id="loginErr"></p>
+      <p class="login__direct" id="loginDirect">ACCESO DIRECTO · CARGANDO PERFIL DE JOSEMI...</p>
     </div>
     <p class="login__brand">JOSEMI_OS / v1.0</p>
   </div>
@@ -134,11 +125,11 @@
     <div class="icons" id="icons"></div>
 
     <div id="menu" class="menu hidden">
-      <div class="menu__head"><span class="menu__avatar">J</span><div><strong>Josemi</strong><small>DAM Student</small></div></div>
-      <div class="menu__label">Applications</div>
+      <div class="menu__head"><span class="menu__avatar">J</span><div><strong>Josemi</strong><small>Estudiante de DAM</small></div></div>
+      <div class="menu__label">Aplicaciones</div>
       <!-- [INTEGRACIÓ JOCOS] Ací el JS pinta els botons del menú (totes les apps + jocs). -->
       <div class="menu__apps" id="menu__apps"></div>
-      <div class="menu__power"><button data-power="restart">↻ Restart</button><button data-power="shutdown">⏻ Shutdown</button></div>
+      <div class="menu__power"><button data-power="restart">↻ Reiniciar</button><button data-power="shutdown">⏻ Apagar</button></div>
     </div>
 
     <!-- Menú contextual que aparece al hacer clic derecho sobre el escritorio. -->
@@ -149,7 +140,7 @@
       <button data-act="system">🖥 Información del sistema</button>
       <!-- [NOU OPCIONAL] Entrada per a obrir els jocs ràpid des del clic dret.
            Si no la vols, esborra esta línia; el JS la ignora si no existeix. -->
-      <button data-act="arcade">🕹 Arcade (Jocs)</button>
+      <button data-act="arcade">🕹 Arcade (Juegos)</button>
     </div>
 
     <!-- Barra de tareas fija: inicio, ventanas abiertas y reloj. -->
@@ -171,8 +162,8 @@
 
   <!-- SHUTDOWN: capa superior que simula apagar y reiniciar el sistema. -->
   <div id="shutdown" class="shutdown hidden">
-    <p id="shutdown__msg">Shutting down JOSEMI OS...</p>
-    <button id="reboot" class="hidden">REBOOT</button>
+    <p id="shutdown__msg">Apagando JOSEMI OS...</p>
+    <button id="reboot" class="hidden">REINICIAR</button>
   </div>
 
   <!-- aria-live anuncia las notificaciones nuevas sin interrumpir al usuario. -->

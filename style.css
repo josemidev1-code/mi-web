@@ -455,3 +455,185 @@ body{font-family:var(--font-ui)}
 .game__hud b{color:#00ff41;font-size:1rem}
 .game--tetris canvas{border-color:rgba(0,200,255,.35);box-shadow:0 0 24px rgba(0,200,255,.14)}
 .game--pacman canvas{border-color:rgba(245,185,66,.35);box-shadow:0 0 24px rgba(245,185,66,.14)}
+
+/* ============================================================
+   JOSEMI_OS 2.0 · mejoras de interacción, Arcade y acceso directo
+   ============================================================ */
+.login__direct{
+  color:#9affb2;
+  font-family:'Courier New',monospace;
+  font-size:11px;
+  letter-spacing:.08em;
+  text-align:center;
+  animation:directPulse 1.1s steps(2,end) infinite;
+}
+@keyframes directPulse{50%{opacity:.45}}
+
+.profile-pending,.profile-note{
+  margin-top:.8rem;
+  padding:.65rem;
+  background:#fff7cf;
+  color:#222;
+  border:1px solid #8b7d3f;
+  font-size:12px;
+  line-height:1.45;
+}
+.clink--button{
+  width:100%;
+  font:inherit;
+  text-align:left;
+  cursor:pointer;
+}
+.arcade-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(150px,1fr));
+  gap:14px;
+  margin-top:18px;
+}
+.game-shortcut{
+  min-height:145px;
+  background:#c0c0c0;
+  color:#000;
+  border-top:2px solid #fff;
+  border-left:2px solid #fff;
+  border-right:2px solid #000;
+  border-bottom:2px solid #000;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  cursor:pointer;
+}
+.game-shortcut:active{
+  border-top-color:#000;
+  border-left-color:#000;
+  border-right-color:#fff;
+  border-bottom-color:#fff;
+}
+.game-shortcut strong{font-size:14px}
+.game-shortcut small{font-size:11px;color:#333}
+
+/* Iconos pixel-art sin imágenes externas */
+.app-pixel-icon{
+  display:inline-block;
+  position:relative;
+  width:28px;
+  height:28px;
+  flex:none;
+  image-rendering:pixelated;
+  vertical-align:middle;
+}
+.glyph .app-pixel-icon{width:34px;height:34px}
+.t-ico .app-pixel-icon,.tb-app .app-pixel-icon{width:14px;height:14px;transform:scale(.8);transform-origin:center}
+.app-pixel-icon--tetris{
+  background:
+    linear-gradient(#18c8ff 0 0) 0 0/8px 8px no-repeat,
+    linear-gradient(#18c8ff 0 0) 8px 0/8px 8px no-repeat,
+    linear-gradient(#18c8ff 0 0) 16px 0/8px 8px no-repeat,
+    linear-gradient(#18c8ff 0 0) 24px 0/8px 8px no-repeat,
+    linear-gradient(#ffd21f 0 0) 0 12px/8px 8px no-repeat,
+    linear-gradient(#ffd21f 0 0) 8px 12px/8px 8px no-repeat,
+    linear-gradient(#b84cff 0 0) 16px 12px/8px 8px no-repeat,
+    linear-gradient(#b84cff 0 0) 16px 20px/8px 8px no-repeat;
+  filter:drop-shadow(1px 1px 0 #000);
+}
+.app-pixel-icon--pacman::before{
+  content:'';
+  position:absolute;
+  inset:3px;
+  border-radius:50%;
+  background:#ffd51f;
+  clip-path:polygon(0 0,100% 0,58% 50%,100% 100%,0 100%);
+  box-shadow:1px 1px 0 #000;
+}
+.app-pixel-icon--pacman::after{
+  content:'';
+  position:absolute;
+  width:4px;height:4px;
+  border-radius:50%;
+  background:#111;
+  left:12px;top:7px;
+}
+
+.game{
+  padding:12px;
+  min-width:100%;
+  min-height:100%;
+  box-sizing:border-box;
+}
+.tetris-layout{
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  gap:18px;
+}
+.game-side{
+  display:flex;
+  flex-direction:column;
+  gap:9px;
+  width:120px;
+}
+.game-panel{
+  background:#111;
+  border:1px solid #555;
+  padding:8px;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  text-align:center;
+}
+.game-panel span,.pac-hud span{font-size:10px;color:#ddd;letter-spacing:.08em}
+.game-panel b,.pac-hud b{font-size:16px;color:#00ff75}
+.tetris-next{
+  width:96px!important;
+  height:96px!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+.game-help{
+  max-width:560px;
+  text-align:center;
+  color:#bdbdbd;
+  font-size:10px;
+  line-height:1.5;
+}
+.pac-hud{
+  width:min(100%,560px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:12px;
+}
+.game--pacman .pac-canvas{
+  border-color:#1b33ff;
+  box-shadow:0 0 20px rgba(30,60,255,.28);
+}
+.secret-screen{
+  min-height:100%;
+  background:#050505;
+  color:#8dff9e;
+  font-family:var(--font-mono);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  gap:16px;
+  padding:30px;
+}
+.secret-skull{font-size:54px;filter:drop-shadow(0 0 8px #00ff41)}
+.secret-screen h2{font-size:16px;max-width:520px}
+.secret-screen p{max-width:560px;line-height:1.6}
+.secret-code{color:#fff}
+
+#clock__time{cursor:pointer}
+
+@media(max-width:640px){
+  .arcade-grid{grid-template-columns:1fr}
+  .tetris-layout{flex-direction:column;align-items:center}
+  .game-side{width:200px;display:grid;grid-template-columns:1fr 1fr}
+  .game-side .game-panel:first-child{grid-row:span 2}
+  .pac-canvas{max-width:100%;height:auto}
+}
