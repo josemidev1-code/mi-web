@@ -1,174 +1,98 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<!--
-  GUÍA RÁPIDA DE ESTE ARCHIVO
-  HTML define la estructura y el contenido. CSS se ocupa del aspecto visual y
-  JavaScript añade el comportamiento. Los atributos id sirven para localizar
-  elementos concretos desde JavaScript; las class se reutilizan desde CSS.
--->
-<meta charset="UTF-8">
-<!-- Hace que el diseño use el ancho real del móvil en lugar de simular una pantalla grande. -->
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="JOSEMI OS — un sistema operativo ficticio (tema Windows 95) para explorar mi portfolio.">
-<title>JOSEMI_OS</title>
-
-<!-- [CANVI] El tipus correcte és image/png (abans tenies img/png, que el navegador ignora). -->
-<link rel="icon" type="image/png" href="img/pc.png">
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="JOSEMI-OS — portfolio interactivo de José Miguel Miralles Gandia, estudiante de DAM y desarrollador de software en proceso.">
+  <meta name="theme-color" content="#050806">
+  <title>JOSEMI-OS · Portfolio interactivo</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Capas decorativas globales. aria-hidden evita que un lector de pantalla las anuncie. -->
   <div id="bg" aria-hidden="true"></div>
-  <!-- [INTEGRACIÓ MATRIX] El fons Matrix (pluja de caràcters) NO va ací:
-       el JS crearà un <canvas id="matrix-wall"> al costat d'este #bg.
-       Per això el #bg ha de quedar buit i amb z-index baix. -->
   <div id="cursor" aria-hidden="true"></div>
 
-  <!-- LOGIN: es la primera capa visible. Las demás empiezan con la clase hidden. -->
-  <div id="login" class="login">
-    <div class="login__card">
-      <!-- pre conserva exactamente espacios y saltos de línea, algo imprescindible para ASCII art. -->
-      <!-- [ASCII INTEGRAT] Este és el teu ASCII gran de l'ordinador amb calavera.
-           No el toque: és el que es veu en entrar. El JS NO el regenera. -->
-      <pre class="login__computer" role="img" aria-label="Ordenador ASCII con una calavera">     _______________________________________________
-    /______________________________________________/|
-    |  ___________________________________________  |
-    | |                                           | |
-    | |              011011011001001              | |
-    | |           101011010101010101101           | |
-    | |         1001110011001100111001100         | |
-    | |        111111111111111111111111111        | |
-    | |        011100110011001110011001100        | |
-    | |        1010       01101       1011        | |
-    | |        100         110         011        | |
-    | |        0000       10000       1100        | |
-    | |        000111   011100011   001110        | |
-    | |          1101001011   1101001011          | |
-    | |           01101011     01101011           | |
-    | |             00011100011110001             | |
-    | |             00 01 11 11 00 00             | |
-    | |              0 10 10 10 10 1              | |
-    | |               1101010101010               | |
-    | |       00 00                   00 00       | |
-    | |      1000111                 0111100      | |
-    | |       00110110             00110110       | |
-    | |           1010110       1010110           | |
-    | |               1010110101011               | |
-    | |                  1100110                  | |
-    | |               1111000111100               | |
-    | |           0000000       0000000           | |
-    | |       00011110             00011110       | |
-    | |      1001101                 1101100      | |
-    | |       01 01                   01 10       | |
-    | |                                           | |
-    | |___________________________________________| |
-    |_________________________________________ o ___|
-    |_______________________________________________|
-                       |       |
-                   ____|_______|____
-                  /_________________\
-     _______________________________________________
-    /______________________________________________/|
-    |  [________________]    [________]    ( o )    ||
-    |______________________________________________|/
-       __________________________________________
-      / [] [] [] [] [] [] [] [] [] [] [] [] [] [] /|
-     / [] [] [] [] [] [] [] [] [] [] [] [] []   / /
-    /_______[____________________]____________/ /
-    |_________________________________________|/</pre>
-      <!-- El texto visual es ASCII; aria-label ofrece una versión clara para accesibilidad. -->
-      <!-- [ASCII INTEGRAT] Este és el "JOSEMI_OS" de lletres grans. També teu. No el toque. -->
-      <h2 class="login__user" aria-label="JOSEMI_OS"><span class="login__ascii" aria-hidden="true">     _  ___  ____  _____ __  __ ___       ___  ____
-    | |/ _ \/ ___|| ____|  \/  |_ _|     / _ \/ ___|
- _  | | | | \___ \|  _| | |\/| || |     | | | \___ \
-| |_| | |_| |___) | |___| |  | || |_____| |_| |___) |
- \___/ \___/|____/|_____|_|  |_|___||___|\___/|____/</span></h2>
-      <!-- JavaScript actualiza esta línea y la barra durante la secuencia de entrada. -->
-      <!-- [INTEGRACIÓ LOGIN] El JS escriurà ací "> AUTHENTICATING..." i omplirà la barra. -->
-      <div class="login__sequence" id="loginSequence" aria-live="polite">
-        <span id="loginSequenceText">&gt; ESPERANDO SEÑAL_</span>
-        <span id="loginSequenceBar">[........................] 0%</span>
+  <!-- Primer contacto: una terminal que construye el sistema en pantalla. -->
+  <section id="login" class="login" aria-label="Secuencia de inicio de JOSEMI-OS">
+    <div class="boot-shell">
+      <div class="boot-shell__bar">
+        <div class="boot-shell__dots" aria-hidden="true"><span></span><span></span><span></span></div>
+        <span class="boot-shell__title">josemi@portfolio: ~/JOSEMI-OS</span>
+        <span class="boot-shell__state">BOOT</span>
       </div>
-      <p class="login__direct" id="loginDirect">ACCESO DIRECTO · CARGANDO PERFIL DE JOSEMI...</p>
+      <div class="boot-shell__body">
+        <pre id="bootTerminalOutput" class="boot-terminal-output" aria-live="polite"></pre>
+        <div class="boot-live-line"><span class="boot-prompt">josemi@portfolio:~$</span> <span id="bootCommand"></span><span class="boot-caret" aria-hidden="true">█</span></div>
+      </div>
+      <div class="boot-shell__footer">
+        <span>JOSEMI-OS // portfolio interactivo</span>
+        <button id="skipBoot" class="boot-skip" type="button">Saltar animación ↵</button>
+      </div>
     </div>
-    <p class="login__brand">JOSEMI_OS / v1.0</p>
-  </div>
+  </section>
 
-  <!-- BOOT: JavaScript añade aquí cada línea del registro de arranque. -->
-  <div id="boot" class="boot hidden">
-    <pre class="boot__ascii">   ___   _____  ___  ___  __  __   ___
-  | _ \ |_   _||_ _|| _ \|  \/  | / _ \
-  |   /   | |   | | |   /| |\/| || (_) |
-  |_|_\   |_|  |___||_|_\|_|  |_| \___/
-
-        JOSEMI OS  ·  Version 1.1</pre>
-    <div id="boot__log" class="boot__log"></div>
-  </div>
-
-  <!-- SPLASH: transición breve entre el arranque y el escritorio. -->
-  <div id="splash" class="splash hidden">
-    <div class="splash__logo"></div>
-    <div class="splash__txt"><b>Windows</b> <span>95</span></div>
-    <div class="splash__bar"><i></i></div>
-  </div>
-
-  <!-- ESCRITORIO: la mayoría del contenido se crea dinámicamente desde script.js. -->
   <main id="desktop" class="desktop hidden">
-    <!-- Contenedores vacíos que JavaScript rellena usando los datos de Apps e ICONS. -->
-    <!-- [INTEGRACIÓ JOCOS] Ací el JS pinta els iconos (inclòs 🎮 Tetris i 🟡 Pac-Man).
-         El JS buscarà EXACTAMENT este id="icons". -->
+    <header class="desktop__topbar">
+      <div class="desktop__identity">
+        <span class="brand-mark">&gt;_</span>
+        <div><strong>JOSEMI-OS</strong><small>portfolio://jose-miguel</small></div>
+      </div>
+      <div class="desktop__status"><span class="status-dot"></span> SISTEMA EN LÍNEA</div>
+    </header>
+
+    <div class="desktop__hint">DOBLE CLIC PARA ABRIR · CLIC DERECHO PARA MÁS OPCIONES</div>
     <div class="icons" id="icons"></div>
 
     <div id="menu" class="menu hidden">
-      <div class="menu__head"><span class="menu__avatar">J</span><div><strong>Josemi</strong><small>Estudiante de DAM</small></div></div>
-      <div class="menu__label">Aplicaciones</div>
-      <!-- [INTEGRACIÓ JOCOS] Ací el JS pinta els botons del menú (totes les apps + jocs). -->
+      <div class="menu__head"><span class="menu__avatar">JM</span><div><strong>José Miguel</strong><small>Desarrollador en proceso · DAM</small></div></div>
+      <div class="menu__label">APLICACIONES</div>
       <div class="menu__apps" id="menu__apps"></div>
       <div class="menu__power"><button data-power="restart">↻ Reiniciar</button><button data-power="shutdown">⏻ Apagar</button></div>
     </div>
 
-    <!-- Menú contextual que aparece al hacer clic derecho sobre el escritorio. -->
     <div id="ctxmenu" class="ctx hidden">
-      <button data-act="refresh">↻ Refrescar</button>
-      <button data-act="wallpaper">🖼 Cambiar Fondo de Pantalla</button>
-      <button data-act="terminal">💻 Abrir Terminal</button>
-      <button data-act="system">🖥 Información del sistema</button>
-      <!-- [NOU OPCIONAL] Entrada per a obrir els jocs ràpid des del clic dret.
-           Si no la vols, esborra esta línia; el JS la ignora si no existeix. -->
-      <button data-act="arcade">🕹 Arcade (Juegos)</button>
+      <button data-act="refresh">↻ Refrescar escritorio</button>
+      <button data-act="wallpaper">◫ Cambiar fondo</button>
+      <button data-act="terminal">&gt;_ Abrir terminal</button>
+      <button data-act="system">◉ Información del sistema</button>
+      <button data-act="arcade">◆ Abrir Arcade</button>
     </div>
 
-    <!-- Barra de tareas fija: inicio, ventanas abiertas y reloj. -->
     <footer class="taskbar">
-      <button id="start" class="taskbar__start"><span class="taskbar__logo">◈</span> JOSEMI</button>
-      <!-- [INTEGRACIÓ FINESTRES] Ací el JS pinta un botó per cada finestra oberta. -->
+      <button id="start" class="taskbar__start"><span class="taskbar__logo">&gt;_</span><span>JOSEMI</span></button>
       <div class="taskbar__apps" id="taskbar__apps"></div>
       <div class="taskbar__tray">
-        <span class="tray__item">📶</span><span class="tray__item">🔊</span><span class="tray__item">🔋 100%</span>
+        <span class="tray__item tray__net">NET:OK</span>
         <span class="tray__clock"><span id="clock__time">--:--</span><small id="clock__date">—</small></span>
       </div>
     </footer>
   </main>
 
-  <!-- [NOU] Contenidor on el gestor de finestres (WM) pinta les finestres dels jocs/apps.
-       És un div buit: el JS l'omple. Si el teu JS ja pinta finestres dins d'un altre lloc,
-       pots esborrar-lo, però és el lloc estàndard i no afecta al teu CSS. -->
+  <!-- Esta advertencia bloquea el primer acceso hasta abrir README.md. -->
+  <div id="readmeNotice" class="readme-notice hidden" role="dialog" aria-modal="true" aria-labelledby="readmeNoticeTitle">
+    <div class="readme-notice__card">
+      <span class="eyebrow">FIRST_BOOT / IMPORTANTE</span>
+      <div class="readme-notice__icon">README.md</div>
+      <h2 id="readmeNoticeTitle">Lectura obligatoria antes de explorar</h2>
+      <p>JOSEMI-OS es un portfolio interactivo, no una web convencional. El README explica cómo funciona el sistema y qué estás a punto de encontrar.</p>
+      <button id="openReadmeNotice" class="btn btn--accent" type="button">ABRIR README.md</button>
+      <small>Después de abrirlo podrás explorar el sistema libremente.</small>
+    </div>
+  </div>
+
   <div id="windows" aria-live="polite"></div>
 
-  <!-- SHUTDOWN: capa superior que simula apagar y reiniciar el sistema. -->
   <div id="shutdown" class="shutdown hidden">
-    <p id="shutdown__msg">Apagando JOSEMI OS...</p>
+    <div class="shutdown__mark">&gt;_</div>
+    <p id="shutdown__msg">Apagando JOSEMI-OS...</p>
     <button id="reboot" class="hidden">REINICIAR</button>
   </div>
 
-  <!-- aria-live anuncia las notificaciones nuevas sin interrumpir al usuario. -->
   <div id="toasts" class="toasts" aria-live="polite"></div>
-  <!-- Se carga al final para que todo el HTML ya exista cuando se ejecute JavaScript. -->
   <script src="script.js"></script>
 </body>
 </html>

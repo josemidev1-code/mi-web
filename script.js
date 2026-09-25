@@ -1,5 +1,5 @@
 /* =========================================================
-   JOSEMI OS · v1.3 (Windows 95)
+   JOSEMI-OS · portfolio interactivo
    WM = motor de ventanas. Apps = contenido plug-in.
    v1.3: + Tetris, + Pac-Man (fantasma perseguidor), + Matrix como wallpaper real.
 
@@ -17,15 +17,22 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms)), pad=n=>String(n).padStart(2,'0
 
 /* --- Estado persistente --- */
 // DEF contiene valores iniciales. Object.assign mezcla encima lo guardado en localStorage.
-const DEF={accent:'#6C63FF',bg:'#050505',wp:0,sound:true,motion:false};
+const DEF={accent:'#6dff9b',bg:'#050806',wp:0,sound:true,motion:false};
 let state=Object.assign({},DEF);
 try{ state=Object.assign(state, JSON.parse(localStorage.getItem('josemi-os')||'{}')); }catch(e){}
+if(['#6C63FF','#00C8FF','#4ade80','#f5b942'].includes(state.accent))state.accent='#6dff9b';
 // localStorage conserva datos aunque se cierre o recargue la pestaña.
 const save=()=>{ try{ localStorage.setItem('josemi-os',JSON.stringify(state)); }catch(e){} };
 
 /* --- Wallpapers (tonos planos estilo Win95) --- */
 // [FIX] Añadido 'matrix' como 5º wallpaper (índice 4).
-const WALLS=['#008080','#006666','#004040','#0080a0','matrix'];
+const WALLS=[
+  'radial-gradient(circle at 18% 18%, rgba(40,130,82,.18), transparent 28%), radial-gradient(circle at 78% 70%, rgba(40,110,160,.10), transparent 30%), var(--bg)',
+  'radial-gradient(circle at 80% 18%, rgba(53,190,146,.14), transparent 25%), var(--bg)',
+  'radial-gradient(circle at 50% 115%, rgba(64,110,210,.18), transparent 38%), var(--bg)',
+  'radial-gradient(circle at 15% 85%, rgba(142,82,190,.13), transparent 30%), var(--bg)',
+  'matrix'
+];
 // [FIX] Si el wp guardado no es válido (p.ej. un número raro), lo ponemos a 0 para evitar errores.
 if(!Number.isInteger(state.wp)||state.wp<0||state.wp>=WALLS.length)state.wp=0;
 
@@ -128,39 +135,42 @@ function toast(m){const t=document.createElement('div');t.className='toast';t.te
    Añadir una app nueva aquí y su id en ICONS basta para mostrarla en el sistema.
    ========================================================= */
 const PROFILE={
-  nombre:'Josemi',
-  rol:'Estudiante de Desarrollo de Aplicaciones Multiplataforma',
-  estado:'Aprendiendo, construyendo y mejorando cada proyecto',
+  nombre:'José Miguel Miralles Gandia',
+  corto:'Josemi',
+  rol:'Desarrollador de software en proceso',
+  estudios:'DAM · Desarrollo de Aplicaciones Multiplataforma · SSIMARRO',
+  estado:'Aprendiendo mientras construyo proyectos reales',
   ubicacion:'España',
-  bio:'Estudiante de Desarrollo de Aplicaciones Multiplataforma interesado en programación, desarrollo web, aplicaciones y tecnología. Me gusta aprender creando proyectos y experimentar con nuevas tecnologías.',
-  aspiracion:'PENDIENTE_DE_PERSONALIZAR',
-  gustos:['Programación','Desarrollo web','Aplicaciones','Tecnología']
+  bio:'Soy estudiante de DAM y me interesa especialmente el mundo de la informática. Ahora mismo estoy profundizando en HTML, CSS y JavaScript construyendo este portfolio, y me gusta utilizar la IA como una herramienta para aprender, crear y resolver problemas con más posibilidades.',
+  aspiracion:'Aspiro a desarrollar automatizaciones y aplicaciones para grandes empresas, combinando programación, inteligencia artificial y mucha creatividad para construir soluciones útiles.',
+  gustos:['Informática','Inteligencia artificial','Automatización','Creatividad','Gimnasio','Boxeo','Running','E-commerce / dropshipping']
 };
 
 const pixelIcon=tipo=>`<span class="app-pixel-icon app-pixel-icon--${tipo}" aria-hidden="true"></span>`;
 
 const Apps={
  about:{title:'Sobre mí',icon:'👤',render:()=>`
-   <div class="app-title">PERFIL DE USUARIO</div>
-   <dl class="kv"><dt>Nombre</dt><dd>${PROFILE.nombre}</dd><dt>Rol</dt><dd>${PROFILE.rol}</dd><dt>Estado</dt><dd>${PROFILE.estado}</dd><dt>Ubicación</dt><dd>${PROFILE.ubicacion}</dd></dl>
-   <div class="divider"></div><p class="bio">${PROFILE.bio}</p>
-   <div class="divider"></div><div class="app-title">LO QUE ME MUEVE</div>
-   <div class="chips">${PROFILE.gustos.map(x=>`<span class="chip g-comf">${x}</span>`).join('')}</div>
-   <div class="divider"></div><div class="app-title">HACIA DÓNDE VOY</div>
-   <p class="bio profile-pending">${PROFILE.aspiracion==='PENDIENTE_DE_PERSONALIZAR'
-     ?'⚠ Pendiente de personalizar contigo: objetivo profesional, tipo de proyectos que quieres crear y qué vida aspiras a construir.'
-     :PROFILE.aspiracion}</p>
-   <div class="divider"></div><div class="app-title">DATOS DEL SISTEMA</div>
-   <dl class="kv"><dt>Curiosidad</dt><dd>100%</dd><dt>Modo actual</dt><dd>Aprendizaje continuo</dd><dt>Bugs</dt><dd>Se arreglan uno a uno</dd><dt>Versión</dt><dd>JOSEMI_OS 2.0</dd></dl>`},
+   <section class="profile-hero">
+     <div class="profile-hero__terminal"><span>josemi@portfolio</span><b>DESARROLLADOR EN PROCESO</b></div>
+     <h2>José Miguel Miralles Gandia</h2>
+     <p>${PROFILE.bio}</p>
+     <div class="chips">${PROFILE.gustos.map(x=>`<span class="chip">${x}</span>`).join('')}</div>
+   </section>
+   <div class="content-grid">
+     <article class="content-card"><span class="card-kicker">01 / AHORA</span><h3>Qué estoy haciendo</h3><p>Estudio <strong>DAM</strong> en <strong>SSIMARRO</strong>. Este proyecto es mi forma de practicar frontend, interacción, diseño y JavaScript mientras construyo algo que realmente me representa.</p></article>
+     <article class="content-card"><span class="card-kicker">02 / OBJETIVO</span><h3>Hacia dónde voy</h3><p>${PROFILE.aspiracion}</p></article>
+     <article class="content-card"><span class="card-kicker">03 / FUERA DEL CÓDIGO</span><h3>No todo es programar</h3><p>Me gusta entrenar en el gimnasio, hacer deporte, practicar boxeo y salir a correr. También experimento con e-commerce y dropshipping.</p></article>
+     <article class="content-card"><span class="card-kicker">04 / MENTALIDAD</span><h3>Build · learn · repeat</h3><p>Estoy al principio del camino, así que prefiero enseñar progreso real antes que fingir experiencia que todavía no tengo.</p></article>
+   </div>`},
 
  projects:{title:'Proyectos',icon:'📁',render:()=>`
-   <div class="app-title">PROYECTOS/</div>
-   <p class="bio">Doble clic para abrir una carpeta. Los datos actuales son los que ya había en tu portfolio y conviene sustituirlos por tus proyectos reales.</p>
+   <div class="app-title">/PROYECTOS</div>
+   <p class="bio">Aquí separo lo que ya estoy construyendo de las áreas en las que quiero seguir experimentando. No relleno el portfolio con proyectos inventados.</p>
    <div class="folder-grid">
-     <div class="folder" tabindex="0" data-folder="java"><span class="g">📁</span><span class="n">Java</span></div>
-     <div class="folder" tabindex="0" data-folder="web"><span class="g">📁</span><span class="n">Web</span></div>
-     <div class="folder" tabindex="0" data-folder="exp"><span class="g">📁</span><span class="n">Experimentos</span></div>
-     <div class="folder" tabindex="0" data-folder="school"><span class="g">📁</span><span class="n">Proyectos de clase</span></div>
+     <div class="folder" tabindex="0" data-folder="web"><span class="g">⌘</span><span class="n">JOSEMI-OS</span><small>Proyecto real</small></div>
+     <div class="folder" tabindex="0" data-folder="school"><span class="g">{ }</span><span class="n">DAM</span><small>Formación</small></div>
+     <div class="folder" tabindex="0" data-folder="auto"><span class="g">⚙</span><span class="n">Automatización</span><small>Roadmap</small></div>
+     <div class="folder" tabindex="0" data-folder="ai"><span class="g">✦</span><span class="n">IA + software</span><small>Roadmap</small></div>
    </div>`,
    bind(b){b.querySelectorAll('.folder').forEach(f=>{
      const abrir=()=>openProject(f.dataset.folder);
@@ -169,35 +179,59 @@ const Apps={
    });}},
 
  skills:{title:'Habilidades',icon:'⚡',render:()=>`
-   <div class="app-title">RECURSOS DEL SISTEMA</div>${bar('Java',80)}${bar('SQL',70)}${bar('HTML',80)}${bar('CSS',70)}${bar('JavaScript',60)}${bar('Git',60)}
-   <div class="cat-label">ME DEFIENDO</div><div class="chips"><span class="chip g-comf">Java</span><span class="chip g-comf">HTML</span><span class="chip g-comf">CSS</span><span class="chip g-comf">SQL</span></div>
-   <div class="cat-label">APRENDIENDO</div><div class="chips"><span class="chip g-learn">JavaScript</span><span class="chip g-learn">Git</span><span class="chip g-learn">Docker</span></div>
-   <div class="cat-label">SIGUIENTE NIVEL</div><div class="chips"><span class="chip g-next">Spring</span><span class="chip g-next">React</span><span class="chip g-next">Backend</span></div>
-   <p class="profile-note">Estos porcentajes ya estaban en el código. Dime cuáles representan de verdad tu nivel y los ajusto.</p>`,
-   bind(b){b.querySelectorAll('.bar>i').forEach(el=>requestAnimationFrame(()=>el.style.width=el.dataset.w+'%'));}},
+   <div class="app-title">STACK / ESTADO ACTUAL</div>
+   <div class="skill-focus">
+     <span class="card-kicker">DONDE MÁS CÓMODO ESTOY AHORA</span>
+     <div class="skill-big"><span>HTML</span><span>CSS</span><span>JavaScript</span></div>
+     <p>Son las tecnologías con las que más estoy trabajando actualmente porque estoy desarrollando JOSEMI-OS.</p>
+   </div>
+   <div class="content-grid content-grid--compact">
+     <article class="content-card"><span class="card-kicker">FORMACIÓN DAM</span><h3>Base de desarrollo</h3><p>Programación, aplicaciones multiplataforma y bases de datos dentro de mi formación. Prefiero no poner porcentajes falsos: mi nivel sigue creciendo.</p></article>
+     <article class="content-card"><span class="card-kicker">ENFOQUE</span><h3>IA + automatización</h3><p>Quiero aprender a utilizar la IA para acelerar desarrollo, crear automatizaciones y construir aplicaciones con más creatividad.</p></article>
+     <article class="content-card"><span class="card-kicker">HERRAMIENTAS</span><h3>Git & GitHub</h3><p>Uso Git y GitHub para versionar este portfolio y seguir aprendiendo un flujo de trabajo real.</p></article>
+     <article class="content-card"><span class="card-kicker">SIGUIENTE PASO</span><h3>Más proyectos</h3><p>La prioridad es construir, equivocarme, corregir y convertir cada proyecto en evidencia real de lo que sé hacer.</p></article>
+   </div>`},
 
  terminal:{title:'Terminal',icon:'💻',render:()=>`
    <div class="term"><div class="term__out" id="term-out"></div>
    <div class="term__line"><span class="p">josemi@portfolio</span>:<span class="dir">~</span>$<input class="term__in" id="term-in" autocomplete="off" spellcheck="false"></div></div>`,
    bind(b){const out=$('#term-out',b),inp=$('#term-in',b);
      const print=(h,c='')=>{const d=document.createElement('div');d.className=c;d.innerHTML=h;out.appendChild(d);out.scrollTop=out.scrollHeight;};
-     print('Terminal de JOSEMI OS · escribe <span class="ok">ayuda</span>');
+     print('Terminal de JOSEMI-OS · escribe <span class="ok">ayuda</span>');
      inp.addEventListener('keydown',e=>{if(e.key!=='Enter')return;const raw=inp.value.trim();inp.value='';
        print(`<span class="p">josemi@portfolio</span>:<span class="dir">~</span>$ ${raw}`);runCommand(raw,print,openWindow);});
      b.addEventListener('click',()=>inp.focus());}},
 
- readme:{title:'LEEME.txt',icon:'📄',render:()=>`<div class="editor"><span class="h"># JOSEMI OS</span>\n\nBienvenido a mi portfolio convertido en sistema operativo.\nAquí puedes conocerme, explorar mis proyectos, ver lo que estoy aprendiendo,\nabrir una terminal e incluso perder unos minutos en el Arcade.\n\nTodo está hecho para tocarlo, abrirlo y descubrirlo.\n\nComandos útiles:\n  Terminal → ayuda\n  Terminal → secreto\n\n<span class="w">Aviso:</span>\nHay easter eggs escondidos por el sistema.</div>`},
+ readme:{title:'README.md',icon:'📄',render:()=>`
+   <article class="markdown-view">
+     <div class="md-path">~/JOSEMI-OS/README.md</div>
+     <h1>JOSEMI-OS</h1>
+     <blockquote><strong>Primer proyecto personal como desarrollador de José Miguel Miralles Gandia.</strong></blockquote>
+     <p>JOSEMI-OS es mi portfolio convertido en un pequeño sistema operativo interactivo. No quería hacer una web típica de “sobre mí + proyectos + contacto”, así que decidí construir un espacio que se pueda explorar, abrir, tocar y descubrir.</p>
+     <h2>¿Quién soy?</h2>
+     <p>Soy <strong>José Miguel Miralles Gandia</strong>, estudiante de <strong>DAM (Desarrollo de Aplicaciones Multiplataforma) en SSIMARRO</strong> y desarrollador de software en proceso.</p>
+     <p>Ahora mismo estoy trabajando especialmente con <code>HTML</code>, <code>CSS</code> y <code>JavaScript</code>. Me interesa la informática, la inteligencia artificial y el potencial de combinar software, automatización y creatividad.</p>
+     <h2>¿Qué es esta web?</h2>
+     <ul><li>Un portfolio interactivo presentado como un sistema operativo propio.</li><li>Un laboratorio para practicar frontend, interacción y JavaScript.</li><li>Un proyecto que irá creciendo conmigo.</li><li>Un sitio con aplicaciones, terminal, Arcade, easter eggs y acertijos.</li></ul>
+     <h2>Cómo explorar</h2>
+     <p>Doble clic abre aplicaciones. Las ventanas se pueden mover, minimizar, maximizar y redimensionar. El clic derecho abre acciones rápidas. En la terminal, <code>ayuda</code> es un buen comienzo.</p>
+     <h2>Easter eggs</h2>
+     <p>Hay secretos escondidos por el sistema. No voy a poner aquí las soluciones. Si encuentras algo raro, puede que no sea un bug.</p>
+     <div class="md-sign">JOSEMI-OS // build, learn, repeat.</div>
+   </article>`},
 
  contact:{title:'Contacto',icon:'📬',render:()=>`
-   <div class="contact"><h2>CONSTRUYAMOS ALGO.</h2><div class="links">
-     <a class="clink" href="https://github.com/josemidev1-code" target="_blank" rel="noopener"><span class="g">🐙</span> GitHub</a>
-     <button class="clink clink--button" id="linkedin-pending"><span class="g">💼</span> LinkedIn · pendiente de personalizar</button>
-     <a class="clink" href="mailto:josemidev1@gmail.com"><span class="g">✉️</span> josemidev1@gmail.com</a>
-   </div><button class="btn btn--accent" id="copy-email">COPIAR CORREO</button></div>`,
-   bind(b){
-     $('#linkedin-pending',b).addEventListener('click',()=>toast('Falta tu URL real de LinkedIn.'));
-     $('#copy-email',b).addEventListener('click',async()=>{try{await navigator.clipboard.writeText('josemidev1@gmail.com');toast('Correo copiado al portapapeles.');}catch{toast('No se ha podido acceder al portapapeles.');}});
-   }},
+   <div class="contact contact--modern">
+     <span class="card-kicker">CONTACTO / NETWORK</span><h2>¿Construimos algo?</h2>
+     <p>Estoy aprendiendo y buscando oportunidades para seguir creando proyectos y mejorar como desarrollador.</p>
+     <div class="links">
+       <a class="clink" href="https://github.com/josemidev1-code" target="_blank" rel="noopener"><span class="g">GH</span><span><b>GitHub</b><small>@josemidev1-code</small></span><i>↗</i></a>
+       <a class="clink" href="https://www.linkedin.com/search/results/people/?keywords=Jose%20Miguel%20Miralles%20Gandia" target="_blank" rel="noopener"><span class="g">IN</span><span><b>LinkedIn</b><small>José Miguel Miralles Gandia</small></span><i>↗</i></a>
+       <a class="clink" href="mailto:josemidev1@gmail.com"><span class="g">@</span><span><b>Email</b><small>josemidev1@gmail.com</small></span><i>↗</i></a>
+     </div>
+     <button class="btn btn--accent" id="copy-email">COPIAR EMAIL</button>
+   </div>`,
+   bind(b){$('#copy-email',b).addEventListener('click',async()=>{try{await navigator.clipboard.writeText('josemidev1@gmail.com');toast('Email copiado al portapapeles.');}catch{toast('No se ha podido acceder al portapapeles.');}});}},
 
  trash:{title:'Papelera',icon:'🗑',render:()=>`
    <div class="app-title">/home/josemi/.papelera</div>
@@ -213,10 +247,10 @@ const Apps={
    <div class="setting"><div>Reducir animaciones<small>Desactiva transiciones y efectos</small></div><button class="switch ${state.motion?'on':''}" id="sw-motion"></button></div>
    <div class="setting"><div>Sonidos<small>Beeps al abrir y cerrar</small></div><button class="switch ${state.sound?'on':''}" id="sw-sound"></button></div>
    <div class="setting"><div>Color de acento<small>Afecta a distintos elementos del sistema</small></div><div class="swatches" id="sw-accent">
-     <span class="swatch ${state.accent==='#6C63FF'?'on':''}" data-c="#6C63FF" style="background:#6C63FF"></span>
-     <span class="swatch ${state.accent==='#00C8FF'?'on':''}" data-c="#00C8FF" style="background:#00C8FF"></span>
-     <span class="swatch ${state.accent==='#4ade80'?'on':''}" data-c="#4ade80" style="background:#4ade80"></span>
-     <span class="swatch ${state.accent==='#f5b942'?'on':''}" data-c="#f5b942" style="background:#f5b942"></span></div></div>
+     <span class="swatch ${state.accent==='#6dff9b'?'on':''}" data-c="#6dff9b" style="background:#6dff9b"></span>
+     <span class="swatch ${state.accent==='#5de4ff'?'on':''}" data-c="#5de4ff" style="background:#5de4ff"></span>
+     <span class="swatch ${state.accent==='#b08cff'?'on':''}" data-c="#b08cff" style="background:#b08cff"></span>
+     <span class="swatch ${state.accent==='#ffd166'?'on':''}" data-c="#ffd166" style="background:#ffd166"></span></div></div>
    <div class="setting"><div>Oscuridad<small>Nivel del fondo</small></div><select id="sel-dark">
      <option value="#050505" ${state.bg==='#050505'?'selected':''}>Oscuro</option>
      <option value="#030303" ${state.bg==='#030303'?'selected':''}>Más oscuro</option>
@@ -233,7 +267,7 @@ const Apps={
      $$('#sw-wp .wp',b).forEach(w=>w.onclick=()=>{state.wp=+w.dataset.w;$$('#sw-wp .wp',b).forEach(x=>x.classList.remove('on'));w.classList.add('on');applyTheme();save();});}},
 
  system:{title:'Monitor del sistema',icon:'🖥️',render:()=>`
-   <div class="app-title">JOSEMI OS · ESTADO: <span style="color:#168b16">EN LÍNEA</span></div>
+   <div class="app-title">JOSEMI-OS · ESTADO: <span style="color:var(--accent)">EN LÍNEA</span></div>
    <div class="sys-grid">
      <div class="sys-card"><b id="sys-uptime">0s</b><span>Tiempo de sesión</span></div>
      <div class="sys-card"><b id="sys-time">--:--</b><span>Hora actual</span></div>
@@ -471,8 +505,9 @@ function runCommand(raw,print,openWin){
   switch(c){
     case'':break;
     case'help':case'ayuda':
-      print('Comandos: <span class="ok">ayuda quien-soy sobre-mi proyectos habilidades contacto limpiar fecha eco ls cat sudo secreto matrix fondo tetris pacman arcade cafe hola 42</span>');break;
-    case'whoami':case'quien-soy':print('Josemi<br>Estudiante de DAM<br>Desarrollador en construcción.');break;
+      print('Comandos: <span class="ok">ayuda readme quien-soy sobre-mi proyectos habilidades contacto limpiar fecha eco ls cat sudo secreto matrix fondo tetris pacman arcade cafe hola 42</span>');break;
+    case'whoami':case'quien-soy':print('José Miguel Miralles Gandia<br>Estudiante de DAM en SSIMARRO<br>Desarrollador de software en proceso.');break;
+    case'readme':print('Abriendo README.md...');openWin('readme');break;
     case'about':case'sobre-mi':print('Abriendo Sobre mí...');openWin('about');break;
     case'projects':case'proyectos':print('Abriendo Proyectos...');openWin('projects');break;
     case'skills':case'habilidades':print('Abriendo Habilidades...');openWin('skills');break;
@@ -480,10 +515,11 @@ function runCommand(raw,print,openWin){
     case'clear':case'limpiar':$('#term-out').innerHTML='';break;
     case'date':case'fecha':print(new Date().toLocaleString('es-ES'));break;
     case'echo':case'eco':print(a||'');break;
-    case'ls':print('sobre-mi.txt  proyectos/  habilidades.json  contacto.txt  juegos/  secreto/');break;
+    case'ls':print('README.md  sobre-mi.txt  suenos.txt  proyectos/  habilidades.json  contacto.txt  juegos/  secreto/');break;
     case'cat':
-      if(a==='sobre-mi.txt'||a==='about.txt')print('Estudiante de DAM. Aprendo creando. Este archivo todavía tiene partes que debemos personalizar juntos.');
-      else if(a==='sueños.txt'||a==='suenos.txt')print('<span class="ok">[ARCHIVO BLOQUEADO]</span> Falta que Josemi escriba aquí exactamente qué quiere conseguir.');
+      if(a.toLowerCase()==='readme.md')print('JOSEMI-OS: mi primer proyecto personal como desarrollador. Portfolio interactivo con aplicaciones, terminal, Arcade, easter eggs y acertijos.');
+      else if(a==='sobre-mi.txt'||a==='about.txt')print('José Miguel Miralles Gandia · estudiante de DAM en SSIMARRO · desarrollador de software en proceso.');
+      else if(a==='sueños.txt'||a==='suenos.txt')print('Crear automatizaciones y aplicaciones para grandes empresas combinando IA, programación y creatividad.');
       else print(`cat: ${a||'(sin archivo)'}: no existe`);break;
     case'sudo':
       if(a.startsWith('rm -rf')){print('<span class="err">Buen intento. JOSEMI_OS se niega a autodestruirse.</span>');break;}
@@ -513,40 +549,26 @@ function matrixMode(){const c=document.createElement('canvas');Object.assign(c.s
 
 /* ========================================================= PROYECTOS */
 const PROJECTS={
- java:{name:'Prácticas de Java',desc:'Prácticas de POO en Java: clases, herencia y colecciones.',lang:'Java',db:'—',fw:'—',date:'POR CONFIRMAR',status:'done',tags:['Java','POO']},
- web:{name:'JOSEMI OS',desc:'Este portfolio convertido en sistema operativo, construido con HTML, CSS y JavaScript.',lang:'HTML/CSS/JS',db:'—',fw:'Vanilla',date:'2026',status:'dev',tags:['Web','JavaScript']},
- exp:{name:'Experimentos',desc:'Prototipos rápidos para aprender tecnologías nuevas.',lang:'Varios',db:'—',fw:'Varios',date:'POR CONFIRMAR',status:'exp',tags:['I+D']},
- school:{name:'Proyectos de clase',desc:'Trabajos de DAM: bases de datos, Java, aplicaciones y ejercicios.',lang:'Java/SQL',db:'PostgreSQL',fw:'—',date:'POR CONFIRMAR',status:'dev',tags:['DAM']}
+ web:{name:'JOSEMI-OS',desc:'Mi primer proyecto personal como desarrollador: un portfolio interactivo con estética de sistema operativo, aplicaciones, terminal, juegos y easter eggs.',lang:'HTML / CSS / JavaScript',db:'—',fw:'Vanilla',date:'2026',status:'dev',tags:['Portfolio','Frontend','JavaScript'],github:'https://github.com/josemidev1-code'},
+ school:{name:'Formación DAM',desc:'Espacio para reunir proyectos y prácticas reales de Desarrollo de Aplicaciones Multiplataforma. No añado detalles concretos hasta tener cada proyecto listo para enseñar.',lang:'En formación',db:'En formación',fw:'—',date:'Actual',status:'dev',tags:['DAM','Aprendizaje']},
+ auto:{name:'Automatización',desc:'Área de roadmap: quiero aprender a crear automatizaciones útiles y convertir procesos repetitivos en software.',lang:'Por definir',db:'—',fw:'—',date:'Roadmap',status:'exp',tags:['Automatización','Roadmap']},
+ ai:{name:'IA + software',desc:'Área de roadmap: explorar cómo integrar inteligencia artificial en aplicaciones y flujos de trabajo de forma creativa.',lang:'Por definir',db:'—',fw:'—',date:'Roadmap',status:'exp',tags:['IA','Creatividad','Roadmap']}
 };
 function openProject(k){const p=PROJECTS[k];if(!p)return;const id='proj-'+k;
   Apps[id]={title:p.name,icon:'📂',render:()=>`<div class="app-title">${p.name.toUpperCase()}</div><p class="bio">${p.desc}</p>
     <div class="proj">${p.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
     <dl class="kv"><dt>Lenguaje</dt><dd>${p.lang}</dd><dt>Base de datos</dt><dd>${p.db}</dd><dt>Framework</dt><dd>${p.fw}</dd><dt>Fecha</dt><dd>${p.date}</dd></dl>
     <span class="status ${p.status}">${p.status==='done'?'COMPLETADO':p.status==='dev'?'EN DESARROLLO':'EXPERIMENTAL'}</span>
-    <div class="btn-row"><button class="btn btn--accent" data-project-action="demo">VER PROYECTO</button><button class="btn" data-project-action="source">VER CÓDIGO</button></div>
-    <p class="profile-note">Los enlaces reales de cada proyecto todavía no están configurados.</p>`,
-    bind(b){b.querySelectorAll('[data-project-action]').forEach(btn=>btn.onclick=()=>toast('Falta añadir el enlace real de este proyecto.'));}};
+    <div class="btn-row">${p.github?`<a class="btn btn--accent" href="${p.github}" target="_blank" rel="noopener">ABRIR GITHUB ↗</a>`:'<span class="roadmap-badge">SIN ENLACE · ROADMAP / FORMACIÓN</span>'}</div>`};
   openWindow(id);
 }
 
-/* ========================================================= BOOT */
-const BOOTL=['Inicializando núcleo...','Cargando perfil de Josemi...','Montando proyectos...','Cargando habilidades...','Iniciando interfaz...'];
-async function boot(){$('#desktop').classList.add('hidden');stopMatrix();const log=$('#boot__log');log.innerHTML='';$('#boot').classList.remove('out','hidden','glitch');
-  for(const l of BOOTL){await sleep(220);log.innerHTML+=`<div><span class="ok">[ OK ]</span> ${l}</div>`;}
-  await sleep(300);log.innerHTML+=`<div class="granted">ACCESO CONCEDIDO</div>`;await sleep(420);
-  $('#boot').classList.add('out');await sleep(320);$('#boot').classList.add('hidden');
-  const sp=$('#splash'); sp.classList.remove('hidden');await sleep(900);
-  sp.classList.add('out');await sleep(320);sp.classList.add('hidden');
-  $('#desktop').classList.remove('hidden');
-  // [FIX] Ara sí: apliquem el tema DESPRÉS de mostrar el desktop => Matrix s'activa si wp=4.
-  applyTheme();
-  (currentUser.auto||[]).forEach(a=>openWindow(a));
-  toast('Bienvenido a JOSEMI_OS, '+currentUser.nom+'.');
-}
+/* ========================================================= REINICIO */
+function boot(){location.reload();}
 
 /* ========================================================= ESCRITORIO */
 // [FIX] Añadidos 'tetris' y 'pacman' perquè tinguen acces directe.
-const ICONS=['about','projects','skills','terminal','readme','contact','arcade','trash','settings','system'];
+const ICONS=['readme','about','projects','skills','terminal','contact','arcade','settings','system','trash'];
 let startTime=Date.now();
 function buildIcons(){const c=$('#icons');c.innerHTML='';
   const llista=(currentUser&&currentUser.apps)?currentUser.apps:ICONS;
@@ -584,9 +606,9 @@ function buildContext(){const ctx=$('#ctxmenu');
   ctx.querySelectorAll('button').forEach(b=>b.onclick=()=>{const a=b.dataset.act;ctx.classList.add('hidden');
     if(a==='refresh'){buildIcons();toast('Escritorio actualizado.');}
     // [FIX] array de noms ara inclou 'Matrix' (5 wallpapers).
-    if(a==='wallpaper'){state.wp=(state.wp+1)%WALLS.length;applyTheme();save();toast('Fondo: '+['Turquesa','Verde oscuro','Océano','Acero','Matrix'][state.wp]);}
+    if(a==='wallpaper'){state.wp=(state.wp+1)%WALLS.length;applyTheme();save();toast('Fondo: '+['Verde nocturno','Bosque','Azul profundo','Violeta','Matrix'][state.wp]);}
     if(a==='terminal')openWindow('terminal');if(a==='system')openWindow('system');if(a==='arcade')openWindow('arcade');});}
-function shutdown(){const s=$('#shutdown');s.classList.remove('hidden');$('#shutdown__msg').textContent='Apagando JOSEMI OS...';
+function shutdown(){const s=$('#shutdown');s.classList.remove('hidden');$('#shutdown__msg').textContent='Apagando JOSEMI-OS...';
   setTimeout(()=>{$('#shutdown__msg').textContent='Ahora puedes cerrar esta pestaña con seguridad.';$('#reboot').classList.remove('hidden');},1600);
   $('#reboot').onclick=()=>location.reload();}
 function buildKonami(){
@@ -603,71 +625,98 @@ function buildKonami(){
    Ya no hay contraseña: el perfil de Josemi se carga automáticamente.
    ========================================================= */
 const currentUser={
-  nom:'Josemi',
-  rol:'Estudiante de DAM',
-  color:'#6C63FF',
-  apps:['about','projects','skills','terminal','readme','contact','arcade','trash','settings','system'],
+  nom:'José Miguel',
+  rol:'Desarrollador en proceso · DAM',
+  color:'#6dff9b',
+  apps:['readme','about','projects','skills','terminal','contact','arcade','settings','system','trash'],
   auto:[]
 };
 
-const ASCII_FX_DURATION=3200;
-const clamp01=n=>Math.max(0,Math.min(1,n));
-const easeOutCubic=n=>1-Math.pow(1-n,3);
-let enteringOS=false;
+const JOSEMI_ASCII=String.raw`
+  JJJ   OOO   SSS  EEEE M   M III       OOO   SSS
+    J  O   O S     E    MM MM  I       O   O S
+    J  O   O  SSS  EEE  M M M  I  ---  O   O  SSS
+ J  J  O   O     S E    M   M  I       O   O     S
+  JJ    OOO   SSS  EEEE M   M III       OOO   SSS`;
 
-function asciiSeed(x,y,salt=0){return ((x*73+y*151+salt*199+x*y*17)%997)/997;}
+let enteringOS=false,bootRun=0;
+const bootDelay=ms=>new Promise(r=>setTimeout(r,ms));
 
-function renderLoginFrame(text,kind,elapsed){
-  if((kind==='computer'&&elapsed>=2000)||(kind==='logo'&&elapsed>=2900))return text;
-  const rows=text.split('\n'),width=Math.max(...rows.map(row=>row.length)),height=rows.length;
-  const canvas=Array.from({length:height},()=>Array(width).fill(' ')),noise='01#$%?+*:/\\';
-  rows.forEach((row,y)=>[...row].forEach((char,x)=>{
-    if(char===' ')return;const seed=asciiSeed(x,y,kind==='computer'?1:2);
-    if(kind==='computer'){
-      if(char==='0'||char==='1'){const age=elapsed-(620+seed*360);if(age<0)return;if(age<820)canvas[y][x]=noise[(Math.floor(age/48)+x*5+y*3)%noise.length];else canvas[y][x]=char;return;}
-      const local=clamp01((elapsed-seed*300)/760);if(local<=0)return;const side=Math.floor(seed*4),sx=side===0?0:side===1?width-1:Math.floor(seed*width),sy=side===2?0:side===3?height-1:Math.floor(asciiSeed(x,y,8)*height),ease=easeOutCubic(local),px=Math.round(sx+(x-sx)*ease),py=Math.round(sy+(y-sy)*ease);
-      canvas[py][px]=local<.72?noise[(x+y+Math.floor(elapsed/55))%noise.length]:char;return;
-    }
-    const local=clamp01((elapsed-(1950+seed*230))/720);if(local<=0)return;if(local>=1){canvas[y][x]=char;return;}
-    const sx=Math.floor(asciiSeed(x,y,4)*width),sy=Math.floor(asciiSeed(x,y,9)*height),ease=easeOutCubic(local),px=Math.round(sx+(x-sx)*ease),py=Math.round(sy+(y-sy)*ease);
-    canvas[py][px]=local>.78?char:noise[(x*3+y+Math.floor(elapsed/50))%noise.length];
-  }));
-  return canvas.map(row=>row.join('')).join('\n');
+function appendBoot(text='',cls=''){
+  const out=$('#bootTerminalOutput');
+  const line=document.createElement('span');line.className=cls;line.textContent=text+'\n';out.appendChild(line);out.scrollTop=out.scrollHeight;return line;
+}
+async function typeBootText(el,text,speed,run){
+  el.textContent='';
+  for(const ch of text){if(run!==bootRun||enteringOS)return false;el.textContent+=ch;await bootDelay(speed);}
+  return true;
+}
+async function typeBootLine(text,cls,speed,run){
+  const out=$('#bootTerminalOutput'),line=document.createElement('span');line.className=cls;out.appendChild(line);
+  const ok=await typeBootText(line,text,speed,run);line.textContent+='\n';out.scrollTop=out.scrollHeight;return ok;
+}
+
+function showReadmeNotice(){
+  const notice=$('#readmeNotice');
+  if(notice)notice.classList.remove('hidden');
 }
 
 function enterOS(){
-  if(enteringOS)return;enteringOS=true;
-  const login=$('#login');
+  if(enteringOS)return;enteringOS=true;bootRun++;
   document.documentElement.style.setProperty('--accent',currentUser.color);
   $('.menu__head strong').textContent=currentUser.nom;
   $('.menu__head small').textContent=currentUser.rol;
-  buildIcons();buildMenu();beep();
-  login.classList.add('out');
-  setTimeout(()=>{login.classList.add('hidden');boot();},500);
+  buildIcons();buildMenu();
+  const login=$('#login');login.classList.add('out');
+  setTimeout(()=>{
+    login.classList.add('hidden');
+    $('#desktop').classList.remove('hidden');
+    startTime=Date.now();applyTheme();
+    toast('JOSEMI-OS iniciado. README.md pendiente de lectura.');
+    showReadmeNotice();
+  },420);
 }
 
-function typeLoginArt(){
-  const login=$('#login'),status=$('#loginSequenceText'),bar=$('#loginSequenceBar');
-  login.classList.remove('ascii-ready');login.classList.add('ascii-intro');
-  const parts=$$('.login__computer,.login__ascii').map(el=>{const text=el.textContent,spacer=document.createElement('span'),ink=document.createElement('span');spacer.textContent=text;spacer.className='ascii-spacer';spacer.setAttribute('aria-hidden','true');ink.className='ascii-ink';ink.setAttribute('aria-hidden','true');el.classList.add('ascii-typing');el.replaceChildren(spacer,ink);return{el,text,ink,kind:el.classList.contains('login__computer')?'computer':'logo'};});
-  const started=performance.now();
-  function finish(){for(const part of parts){part.el.textContent=part.text;part.el.classList.remove('ascii-typing');}login.classList.remove('ascii-intro','ascii-pulse','ascii-glitch');login.classList.add('ascii-ready');status.textContent='[ PERFIL VERIFICADO · ACCESO DIRECTO ]';bar.textContent='[########################] 100%';setTimeout(enterOS,260);}
-  function frame(now){const elapsed=now-started,progress=clamp01(elapsed/ASCII_FX_DURATION);if(elapsed>=ASCII_FX_DURATION||login.classList.contains('out')||login.classList.contains('hidden')){finish();return;}for(const part of parts)part.ink.textContent=renderLoginFrame(part.text,part.kind,elapsed);
-    login.classList.toggle('ascii-pulse',(elapsed>1200&&elapsed<1550)||(elapsed>2700&&elapsed<2950));
-    status.textContent=elapsed<550?'> SEÑAL RECIBIDA_':elapsed<1200?'> CONSTRUYENDO PANTALLA ASCII...':elapsed<1950?'> DESCIFRANDO NÚCLEO BINARIO...':elapsed<2700?'> CARGANDO JOSEMI_OS...':'> CARGANDO PERFIL DE JOSEMI...';
-    const filled=Math.round(progress*24);bar.textContent=`[${'#'.repeat(filled)}${'.'.repeat(24-filled)}] ${String(Math.round(progress*100)).padStart(3,' ')}%`;requestAnimationFrame(frame);}
-  for(const part of parts)part.ink.textContent=renderLoginFrame(part.text,part.kind,0);requestAnimationFrame(frame);
+async function typeLoginArt(){
+  const run=++bootRun;enteringOS=false;
+  const login=$('#login'),out=$('#bootTerminalOutput'),cmd=$('#bootCommand');
+  login.classList.remove('hidden','out');out.innerHTML='';cmd.textContent='';
+
+  await typeBootText(cmd,'./boot-josemi-os --portfolio',28,run);if(run!==bootRun)return;
+  await bootDelay(160);appendBoot('josemi@portfolio:~$ ./boot-josemi-os --portfolio','boot-command-history');cmd.textContent='';
+  const steps=[
+    ['[  OK  ] terminal.init()','boot-ok'],
+    ['[  OK  ] detectando visitante...','boot-dim'],
+    ['[  OK  ] montando /portfolio','boot-dim'],
+    ['[  OK  ] cargando identidad: José Miguel Miralles Gandia','boot-ok'],
+    ['[  OK  ] perfil: desarrollador de software en proceso','boot-dim'],
+    ['[  OK  ] cargando proyectos, terminal y arcade','boot-dim'],
+    ['[  OK  ] buscando bugs... se encontraron algunos. Perfecto.','boot-warn']
+  ];
+  for(const [text,cls] of steps){if(!await typeBootLine(text,cls,8,run))return;await bootDelay(80);}
+  appendBoot('');
+  for(const line of JOSEMI_ASCII.split('\n')){if(run!==bootRun)return;await typeBootLine(line,'boot-logo',2,run);}
+  appendBoot('');
+  await typeBootLine('PORTFOLIO INTERACTIVO // BUILD · LEARN · REPEAT','boot-accent',10,run);
+  await typeBootLine('AVISO: README.md es obligatorio en el primer arranque.','boot-warn',10,run);
+  await typeBootLine('[ READY ] iniciando interfaz...','boot-ok',10,run);
+  await bootDelay(420);if(run===bootRun)enterOS();
 }
 
 function showLogin(){
-  enteringOS=false;
   $('#desktop').classList.add('hidden');stopMatrix();
-  const l=$('#login');l.classList.remove('hidden','out');typeLoginArt();
+  const notice=$('#readmeNotice');if(notice)notice.classList.add('hidden');
+  typeLoginArt();
 }
 
 function initDirectAccess(){
-  $('#login').addEventListener('click',e=>{if(e.target.closest('a,button'))return;enterOS();});
-  addEventListener('keydown',e=>{if(!$('#login').classList.contains('hidden')&&(e.key==='Enter'||e.key===' ')){e.preventDefault();enterOS();}});
+  $('#skipBoot').addEventListener('click',enterOS);
+  $('#openReadmeNotice').addEventListener('click',()=>{
+    $('#readmeNotice').classList.add('hidden');openWindow('readme');
+  });
+  addEventListener('keydown',e=>{
+    if(!$('#login').classList.contains('hidden')&&e.key==='Enter'){e.preventDefault();enterOS();}
+  });
 }
 
 /* ========================================================= INICIO */
